@@ -566,7 +566,7 @@ class Car{
   }
 }
 function deformArr(P,O,lx,ly,lz,dx,dy,dz,str,rad,belt){
-  const r2=rad*rad,maxD=.72,adz=Math.abs(dz),adx=Math.abs(dx);
+  const r2=rad*rad,maxD=.9,adz=Math.abs(dz),adx=Math.abs(dx);
   for(let k=0;k<P.length;k+=3){
     const ex=P[k]-lx,ey=(P[k+1]-ly)*.8,ez=P[k+2]-lz,d2=ex*ex+ey*ey+ez*ez;if(d2>=r2)continue;
     let f=1-Math.sqrt(d2)/rad;f=f*f*str*(.7+.6*hash3(O[k],O[k+1],O[k+2]));
@@ -854,10 +854,10 @@ function impact(A,B,h,speed,obs){
   const key=B?B.uid:-1-obs.id;const last=A.cd.get(key)||-9;if(simTime-last<.18)return;A.cd.set(key,simTime);
   const power=speed-1.3;
   const pole=obs&&obs.kind==='pole';
-  const rad=pole?clamp(.3+speed*.018,.3,.7):clamp(.42+speed*.035,.42,1.45);
+  const rad=pole?clamp(.34+speed*.02,.34,.8):clamp(.5+speed*.04,.5,1.6);
   const shA=B?clamp(2*B.m/(A.m+B.m),.35,1.65):1.3;
-  A.dentWorld(h.px,h.pz,-h.nx,-h.nz,Math.min(.6,power*.046*shA*(pole?1.35:1)),rad);
-  if(B){if(B.ai)B.ai.cruise=Math.max(6,B.ai.cruise*.9);B.dentWorld(h.px,h.pz,h.nx,h.nz,Math.min(.6,power*.046*clamp(2*A.m/(A.m+B.m),.35,1.65)),rad)}
+  A.dentWorld(h.px,h.pz,-h.nx,-h.nz,Math.min(.78,.04+power*.064*shA*(pole?1.35:1)),rad);
+  if(B){if(B.ai)B.ai.cruise=Math.max(6,B.ai.cruise*.9);B.dentWorld(h.px,h.pz,h.nx,h.nz,Math.min(.78,.04+power*.064*clamp(2*A.m/(A.m+B.m),.35,1.65)),rad)}
   A.addDamage(power*.4*shA*(pole?1.2:1));
   if(B)B.addDamage(power*.4*clamp(2*A.m/(A.m+B.m),.35,1.65));
   if(B&&B.parked&&!B.dead)B.parked=false;
@@ -1120,7 +1120,7 @@ function hammer(cx,cy){
   if(!showCar)return;const r=canvas.getBoundingClientRect();ndc.set((cx-r.left)/r.width*2-1,-(cy-r.top)/r.height*2+1);
   ray.setFromCamera(ndc,showCam);const hit=ray.intersectObjects([showCar.crisp.mesh,showCar.detMesh],false)[0];if(!hit)return;
   const lp=showCar.body.worldToLocal(hit.point.clone());const n=hit.face.normal;
-  if(showCar.dead)return;showCar.dent(lp.x,lp.y,lp.z,-n.x,-n.y,-n.z,.17,.4);crashSound(.5);showIdle=0;showCar.addDamage(4);updShowDmg();
+  if(showCar.dead)return;showCar.dent(lp.x,lp.y,lp.z,-n.x,-n.y,-n.z,.23,.45);crashSound(.5);showIdle=0;showCar.addDamage(4);updShowDmg();
 }
 
 /* =====================================================================
