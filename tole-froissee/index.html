@@ -466,9 +466,9 @@ function buildDetailGeo(sp,S){
   // ---- pare-chocs & plaques
   const byF=b0+hF*.3,byR=b1+hR*.24;
   if(sp.bumper!=='body'){const bc=sp.bumper==='chrome'?K.chrome:'#1b1c1e';
-    add(new THREE.BoxGeometry(2*hwF+.1,.1,.13),bc,0,byF,zF(byF)+.035);
-    add(new THREE.BoxGeometry(2*hwR+.1,.1,.13),bc,0,byR,zR(byR)-.035);
-    add(new THREE.BoxGeometry(.12,.1,.5),bc,hwF+.03,byF,zF(byF)-.2);add(new THREE.BoxGeometry(.12,.1,.5),bc,-hwF-.03,byF,zF(byF)-.2);}
+    add(new THREE.BoxGeometry(2*hwF+.1,.1,.13,16,1,1),bc,0,byF,zF(byF)+.035);
+    add(new THREE.BoxGeometry(2*hwR+.1,.1,.13,16,1,1),bc,0,byR,zR(byR)-.035);
+    add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,hwF+.03,byF,zF(byF)-.2);add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,-hwF-.03,byF,zF(byF)-.2);}
   const plateZ=sp.bumper!=='body'?.105:.008,yPF=sp.bumper!=='body'?byF:b0+hF*.22,ryP=b1+hR*.44;
   const xf=(x,y,z,rx,ry,ord)=>new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx,ry,0,ord)),new THREE.Vector3(1,1,1));
   const plates=[xf(0,yPF,zF(yPF)+plateZ,tiltF,0,'XYZ'),xf(0,ryP,zR(ryP)-.009,tiltR,Math.PI,'YXZ')];
@@ -620,6 +620,7 @@ class Car{
     this.accel=1.6+.33*Math.sqrt(sp.hp/(sp.kg/1000));this.vmax=sp.vmax/3.6*.92;
     this.tRoll=0;this.tPit=0;this.tRollV=0;this.tPitV=0;this.flipped=false;this.flipT=0;
     this.y=0;this.vyA=0;this.fly=false;this.yv=0;this.rp=0;this.rr=0;this.rpT=0;this.rrT=0;this.gnd=0;
+    this.wraps=[];
     this.cd=new Map();this.damage=0;this.roll=0;this.pitch=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.fxT=0;
   }
   addDamage(v){if(this.dead||v<=0)return;const before=this.damage;this.damage=Math.min(100,this.damage+v);
@@ -640,8 +641,8 @@ class Car{
   repair(){this.crisp.reset();this.det.P.set(this.det.O);this.det.geo.attributes.position.needsUpdate=true;this.det.geo.computeVertexNormals();
     this.det.geo.attributes.color.array.set(this.det.C0);this.det.geo.attributes.color.needsUpdate=true;
     for(const g of this.glows.concat(this.plates)){g.P.set(g.O);g.geo.attributes.position.needsUpdate=true;g.m.visible=true}
-    this.fly=false;this.flipped=false;this.tRoll=this.tPit=this.tRollV=this.tPitV=0;this.vyA=0;
-    for(const w of this.wheels)w.camber=0;this.damage=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.air=false;this.flipA=0;this.group.position.y=0;this.group.rotation.x=0;if(!this.wasParked)this.parked=false}
+    this.wraps=[];this.fly=false;this.flipped=false;this.tRoll=this.tPit=this.tRollV=this.tPitV=0;this.vyA=0;
+    for(const w of this.wheels){w.camber=0;w.pv.position.x=w.x;w.pv.position.z=w.z}this.damage=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.air=false;this.flipA=0;this.group.position.y=0;this.group.rotation.x=0;if(!this.wasParked)this.parked=false}
   sync(dt){
     const air=this.fly||this.flipped;
     if(!air){const kr=Math.min(1,dt*10);this.rp=lerp(this.rp,this.rpT,kr);this.rr=lerp(this.rr,this.rrT,kr)}
@@ -737,6 +738,25 @@ function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;
 const noise=(g,w,h,n,a)=>{for(let i=0;i<n;i++){const v=Math.random()<.5?0:255;g.fillStyle=`rgba(${v},${v},${v},${a*Math.random()})`;g.fillRect(Math.random()*w,Math.random()*h,1+Math.random()*2,1+Math.random()*2)}};
 
 const POND={x:0,z:0,rx:0,rz:0},BUILT_EDGES=[];
+/* ---------- COLOSSES : personnages indestructibles ---------- */
+const PEOPLE=[];
+const SKIN=['#f1c7a4','#e0ac85','#c68863','#9c6644','#6e4630','#f5d6bc'],SHIRT=['#2c3e66','#8a1f1f','#2f5d3a','#111214','#d9d6cf','#c8781d','#5b2a7a','#3a6f8f'],PANTS=['#22262e','#3b3226','#1d2c45','#4a4a48'],HAIR=['#1a1410','#3b2618','#7a5a32','#d8c27a','#111'];
+function makePersonGeo(){const pick=a=>a[(Math.random()*a.length)|0],sk=pick(SKIN),sh=pick(SHIRT),pa=pick(PANTS),L=[];
+  const b=(w,h,d,x,y,z,col,rx=0,rz=0)=>{const g=new THREE.BoxGeometry(w,h,d);g.rotateX(rx);g.rotateZ(rz);g.translate(x,y,z);L.push(paint(g,col))};
+  for(const sx of [-1,1]){b(.19,.86,.21,sx*.12,.48,0,pa);b(.21,.1,.31,sx*.12,.05,.04,'#1b1b1d')}
+  b(.46,.1,.27,0,.93,0,'#2a1f16');            // ceinture
+  b(.5,.52,.3,0,1.18,0,sh);b(.68,.2,.34,0,1.44,0,sh); // torse + épaules larges
+  for(const sx of [-1,1])b(.17,.4,.18,sx*.36,1.24,.02,sh,0,sx*.12); // bras
+  b(.6,.14,.16,0,1.17,.2,sk);b(.62,.15,.17,0,1.27,.19,sh); // bras croisés
+  b(.14,.1,.14,0,1.58,0,sk);
+  const body=mergeGeos(L);
+  const H=[paint(new THREE.IcosahedronGeometry(.135,1).translate(0,.0,0),sk),paint(new THREE.SphereGeometry(.142,10,6,0,Math.PI*2,0,Math.PI*.45).translate(0,.02,-.005),pick(HAIR)),
+    paint(new THREE.BoxGeometry(.2,.045,.04).translate(0,.025,.12),'#0c0c0e')];  // lunettes noires
+  return{body,head:mergeGeos(H)}}
+function addPerson(x,z,a,list){if(PEOPLE.some(p=>Math.hypot(p.x-x,p.z-z)<3)||cars.some(c=>Math.hypot(c.x-x,c.z-z)<4))return;
+  const g=makePersonGeo(),mat=new THREE.MeshLambertMaterial({vertexColors:true}),grp=new THREE.Group(),body=new THREE.Mesh(g.body,mat),head=new THREE.Mesh(g.head,mat);
+  head.position.y=1.71;grp.add(body,head);body.castShadow=head.castShadow=SHADOWS;const sc=.97+Math.random()*.13;grp.scale.setScalar(sc);
+  grp.position.set(x,0,z);grp.rotation.y=a;game.add(grp);PEOPLE.push({x,z,a,grp,body,head,react:0,look:0,ph:Math.random()*6})}
 const ROADS=[-350,-250,-150,-50,50,150,250,350],HALF=410,RW=16;
 const RAMPS=[];let _gH=0,_gS=0,_gA=0;
 function groundAt(x,z){_gH=0;_gS=0;_gA=0;for(const r of RAMPS){const dx=x-r.x,dz=z-r.z;if(dx*dx+dz*dz>r.rr)continue;
@@ -860,6 +880,12 @@ function buildWorld(){
       cr.setColorAt(i,tc.setHSL(hue+Math.random()*.06,.42+Math.random()*.15,.24+Math.random()*.1).convertSRGBToLinear());addStatic(p[0],p[1],.25,.25,0,'pole')});
     tr.castShadow=cr.castShadow=SHADOWS;game.add(tr,cr)};
   plant(leafy,crownG,.22);plant(conif,coneG,.3);
+  // Colosses sur les trottoirs, dans l'arène et les parcs
+  for(const [x,z,a] of [[18,-8,-1.2],[-14,-26,.4],[6,28,3],[-30,14,1.5],[-100,64,0],[-128,100,1.6],[-200,-200,.5],[200,200,2]])addPerson(x,z,a);
+  for(let i=0,n=0;i<400&&n<34;i++){const r=R[(Math.random()*R.length)|0],t=(Math.random()*2-1)*(HALF-30),side=Math.random()<.5?-1:1,vert=Math.random()<.5;
+    if(R.some(q=>Math.abs(q-t)<15))continue;const off=r+side*(RW/2+2.2),x=vert?off:t,z=vert?t:off;
+    if(RAMPS.some(o=>Math.hypot(o.x-x,o.z-z)<8))continue;const before=PEOPLE.length;
+    addPerson(x,z,vert?(side>0?-Math.PI/2:Math.PI/2):(side>0?Math.PI:0));if(PEOPLE.length>before)n++}
   // buissons et massifs de fleurs
   for(const b of BUILT_EDGES)BUSH.push(b);
   if(BUSH.length){const bm=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.75,1).translate(0,.45,0),L({color:'#ffffff'}),BUSH.length);
@@ -1071,11 +1097,42 @@ function impact(A,B,h,speed,obs){
   crashSound(Math.min(1.2,speed/22)*(involved?1:clamp(1-dist/60,0,.6)));
   if(involved){shake=Math.min(1,shake+speed/22);if(speed>9)toast(speed>22?'GROS CRASH !':speed>15?'AÏE !':'BOUM')}
 }
+// pliage : la tôle s'enroule autour du Colosse, jusqu'à la moitié de la voiture
+function foldArr(P,side,lat,D,sp){const L2=sp.L/2,W2=sp.W/2,R0=.3,RW=1.35,belt=sp.belt;
+  for(let k=0;k<P.length;k+=3){const x=P[k],z=P[k+2];let r,s;
+    if(side==='F'){r=Math.abs(x-lat);s=L2-z}else if(side==='B'){r=Math.abs(x-lat);s=z+L2}else if(side==='L'){r=Math.abs(z-lat);s=W2-x}else{r=Math.abs(z-lat);s=x+W2}
+    if(r>=RW)continue;const kf=r<=R0?1:.5+.5*Math.cos((r-R0)/(RW-R0)*Math.PI),T=D*kf;if(s>=T)continue;
+    const ns=T+Math.max(0,s)*.1,push=ns-s,h=hash3(P[k]*3.1,P[k+1]*7.3,P[k+2]*5.7)-.5;
+    if(side==='F')P[k+2]=L2-ns;else if(side==='B')P[k+2]=ns-L2;else if(side==='L')P[k]=W2-ns;else P[k]=ns-W2;
+    P[k+1]=Math.max(.02,P[k+1]+push*(P[k+1]>belt-.2?.09:.02)+push*h*.08);
+    if(side==='F'||side==='B')P[k]+=push*h*.06;else P[k+2]+=push*h*.06}}
+function wrapAllowed(c,side,lat){let d=0;for(const w of c.wraps)if(w.side===side&&Math.abs(w.lat-lat)<.3)d=Math.max(d,w.d);return d}
+function personHit(c,p,side,lat,D,vin){
+  let w=c.wraps.find(w=>w.side===side&&Math.abs(w.lat-lat)<.3);if(!w)c.wraps.push(w={side,lat,d:0});w.d=D;
+  for(const A of [c.crisp.P,c.det.P,...c.glows.map(g=>g.P),...c.plates.map(g=>g.P)])foldArr(A,side,lat,D,c.sp);
+  c.crisp.rebuild();c.det.geo.attributes.position.needsUpdate=true;c.det.geo.computeVertexNormals();for(const g of c.glows.concat(c.plates))g.geo.attributes.position.needsUpdate=true;
+  for(const wh of c.wheels){const pt=[wh.pv.position.x,0,wh.pv.position.z];foldArr(pt,side,lat,D,c.sp);
+    const mv=Math.hypot(pt[0]-wh.pv.position.x,pt[2]-wh.pv.position.z);if(mv>.01){wh.pv.position.x=pt[0];wh.pv.position.z=pt[2];wh.camber=clamp(wh.camber+wh.sg*Math.min(.3,mv*.25),-.4,.4)}}
+  if(!c.dead)c.damage=Math.max(c.damage,Math.min(95,c.damage+vin*.45)); // un Colosse ne fait jamais exploser la voiture
+  p.react=1;sparks(p.x,p.z,Math.min(40,vin*2|0));crashSound(Math.min(1.2,vin/16));
+  if(c===player){shake=Math.min(1.6,shake+vin/14);if(vin>6)toast(['IL N\'A RIEN SENTI !','SOLIDE COMME UN ROC','PLIÉE EN DEUX !'][(Math.random()*3)|0])}}
+function personContact(c,p,dt){
+  if(c.y>1.6)return;const ca=Math.cos(c.a),sa=Math.sin(c.a),dx=p.x-c.x,dz=p.z-c.z,lx=dx*ca-dz*sa,lz=dx*sa+dz*ca,Rp=.3;
+  if(Math.abs(lx)>c.hw+Rp||Math.abs(lz)>c.hl+Rp)return;
+  const pz=c.hl+Rp-Math.abs(lz),px=c.hw+Rp-Math.abs(lx);let side,pen,lat,maxD,ax,az;
+  if(pz/c.hl<=px/c.hw){side=lz>0?'F':'B';pen=pz;lat=lx;maxD=c.sp.L*.5;const g=lz>0?1:-1;ax=sa*g;az=ca*g}
+  else{side=lx>0?'L':'R';pen=px;lat=lz;maxD=c.sp.W*.42;const g=lx>0?1:-1;ax=ca*g;az=-sa*g}
+  const vin=c.vx*ax+c.vz*az,allowed=wrapAllowed(c,side,lat);
+  if(pen>allowed&&vin>1.5&&allowed<maxD-.01)personHit(c,p,side,lat,Math.min(maxD,Math.max(allowed,pen)+vin*.12),vin);
+  const lim=wrapAllowed(c,side,lat);
+  if(pen>lim+.02){const back=pen-lim;c.x-=ax*back;c.z-=az*back;if(vin>0){c.vx-=ax*vin*1.1;c.vz-=az*vin*1.1}c.w*=.5}
+  else if(vin>0&&lim>0){const dec=Math.min(vin,vin*vin/(2*Math.max(.05,lim-pen))*dt);c.vx-=ax*dec;c.vz-=az*dec}}
 function physics(dt,inp){
   simTime+=dt;
   for(const c of cars){if(c.dead||c.flipped)stepCar(c,{hb:1},dt);else if(c===player)stepCar(c,inp,dt);else if(c.ai)stepCar(c,aiInput(c,dt),dt);else stepCar(c,{gas:0,brake:0,hb:c.parked?1:0,steer:0},dt)}
   for(let i=0;i<cars.length;i++){const A=cars[i];
     for(let j=i+1;j<cars.length;j++){const B=cars[j];const dx=B.x-A.x,dz=B.z-A.z,rr=A.r+B.r;if(dx*dx+dz*dz>rr*rr||Math.abs(A.y-B.y)>1.1)continue;const h=sat(A,B);if(h)resolve(A,B,h,null)}
+    for(const p of PEOPLE){const dx=p.x-A.x,dz=p.z-A.z;if(dx*dx+dz*dz<(A.r+.5)**2)personContact(A,p,dt)}
     stamp++;const cx0=Math.floor((A.x-A.r)/CELL),cx1=Math.floor((A.x+A.r)/CELL),cz0=Math.floor((A.z-A.r)/CELL),cz1=Math.floor((A.z+A.r)/CELL);
     for(let cx=cx0;cx<=cx1;cx++)for(let cz=cz0;cz<=cz1;cz++){const l=grid.get(gkey(cx,cz));if(!l)continue;
       for(const o of l){if(o.st===stamp)continue;o.st=stamp;const dx=o.x-A.x,dz=o.z-A.z,rr=A.r+o.r;if(dx*dx+dz*dz>rr*rr||A.y>o.h-.15)continue;if(o.ramp){const r=o.ramp;if((A.x-r.x)*r.s+(A.z-r.z)*r.c<r.len/2)continue}const h=sat(A,o);if(h)resolve(A,null,h,o)}}}
@@ -1374,6 +1431,9 @@ function frame(now){
   const sub=3,h=dt/sub;for(let i=0;i<sub;i++)physics(h,inp);
   for(const c of cars)c.sync(dt);
   updSparks(dt);fxGame.update(dt);respawnWrecks(dt);
+  for(const q of PEOPLE){const dx=player.x-q.x,dz=player.z-q.z;if(dx*dx+dz*dz>3600)continue;q.ph+=dt;
+    const tgt=clamp(wrapA(Math.atan2(dx,dz)-q.a),-1.1,1.1);q.look=lerp(q.look,tgt,Math.min(1,dt*3));q.head.rotation.y=q.look;
+    q.react=Math.max(0,q.react-dt*1.6);const br=1+Math.sin(q.ph*2)*.012;q.body.scale.set(1+q.react*.06,br,1+q.react*.06);q.head.rotation.x=-q.react*.25}
   WATER_N.offset.x+=dt*.018;WATER_N.offset.y+=dt*.011;
   for(const c of cars){if(!POND.rx)break;const ix=(c.x-POND.x)/POND.rx,iz=(c.z-POND.z)/POND.rz,inW=ix*ix+iz*iz<.96&&!c.fly&&c.y<.3;
     if(inW){if(c.wet==null){c.wet=0;fxGame.splash(c.x,c.z);crashSound(.25)}c.wet+=dt;const k=Math.max(0,1-dt*2.6);c.vx*=k;c.vz*=k;c.w*=k;c.sink=Math.min(.75,c.wet*.9);
