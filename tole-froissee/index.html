@@ -159,7 +159,7 @@ button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
 </div>
 <div id="kbd" hidden>Flèches / ZQSD : conduire · Espace : frein à main · C : caméra · R : réparer</div>
 <div id="toast"></div>
-<div id="dead" hidden><b>VOITURE DÉTRUITE</b><p>Les dégâts ont atteint 100 %.</p><button id="dRepair">RÉPARER ET REPARTIR</button></div>
+<div id="dead" hidden><b>VOITURE DÉTRUITE</b><p id="dTxt">Nouvelle voiture dans 5 s</p><button id="dRepair">REPARTIR MAINTENANT</button></div>
 <div id="loading">CHARGEMENT…</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1053,8 +1053,27 @@ function updShowDmg(){$('#mDmg').textContent=showCar&&showCar.damage>.5?`Dégât
 $('#mRepair').onclick=()=>{if(showCar){showCar.repair();updShowDmg()}};
 $('#go').onclick=()=>startGame();
 $('#hGarage').onclick=()=>openMenu();
-$('#hRepair').onclick=()=>{if(player){player.repair();$('#dead').hidden=true;toast('RÉPARÉE')}};
-$('#dRepair').onclick=()=>$('#hRepair').onclick();
+$('#hRepair').onclick=()=>{if(!player)return;if(player.dead){respawnPlayer();return}player.repair();toast('RÉPARÉE')};
+$('#dRepair').onclick=()=>respawnPlayer();
+// réapparition : l'épave reste sur place, une voiture neuve arrive ailleurs sur une route
+const RESPAWN_DELAY=5,wrecks=[];
+function respawnSpot(fx,fz){
+  for(let tries=0;tries<60;tries++){
+    const r=ROADS[(Math.random()*ROADS.length)|0],t=(Math.random()*2-1)*(HALF-30);
+    if(ROADS.some(q=>Math.abs(q-t)<22))continue;
+    const vert=Math.random()<.5,fwd=Math.random()<.5;
+    const x=vert?r+(fwd?-4:4):t,z=vert?t:r+(fwd?4:-4),a=vert?(fwd?0:Math.PI):(fwd?Math.PI/2:-Math.PI/2);
+    if(Math.hypot(x-fx,z-fz)<120&&tries<50)continue;
+    if(cars.some(c=>Math.hypot(c.x-x,c.z-z)<9))continue;
+    return[x,z,a]}
+  return[-54,-110,0]}
+function respawnPlayer(){
+  const old=player;old.wreck=true;wrecks.push(old);
+  while(wrecks.length>3){const w=wrecks.shift();game.remove(w.group);const i=cars.indexOf(w);if(i>=0)cars.splice(i,1)}
+  const [x,z,a]=respawnSpot(old.x,old.z);
+  player=new Car(specFor(selected));player.setPose(x,z,a);cars.push(player);game.add(player.group);
+  camPos.set(x-Math.sin(a)*8,3,z-Math.cos(a)*8);$('#dead').hidden=true;toast('NOUVELLE VOITURE');
+}
 let camMode=0;const CAMS=['POURSUITE','LOIN','CAPOT','DESSUS'];
 $('#hCam').onclick=()=>{camMode=(camMode+1)%4;toast(CAMS[camMode])};
 function setMuteUI(){$('#hSnd').textContent=muted?'SON : NON':'SON';if(master)master.gain.value=muted?0:.55}
@@ -1067,6 +1086,7 @@ function startGame(){
   $('#loading').hidden=false;
   setTimeout(()=>{
     if(!worldBuilt){buildWorld();spawnTraffic()}
+    if(player&&player.dead)respawnPlayer();
     if(!player||player.sp.base!==selected||player.sp.ckey!==custKey(selected)){
       let x=-54,z=-110,a=0;
       if(player){x=player.x;z=player.z;a=player.a;game.remove(player.group);cars.splice(cars.indexOf(player),1)}
@@ -1148,7 +1168,8 @@ function frame(now){
   // HUD
   $('#spd').textContent=Math.round(Math.abs(p.vF)*3.6);
   const dmg=Math.round(p.damage);$('#dmgTxt').textContent=dmg+'%';$('#dmgBar').style.width=dmg+'%';
-  if(p.dead&&p.deadT>2.3&&$('#dead').hidden)$('#dead').hidden=false;
+  if(p.dead&&p.deadT>2.3){if($('#dead').hidden)$('#dead').hidden=false;const left=Math.ceil(RESPAWN_DELAY-p.deadT);$('#dTxt').textContent=left>1?`Nouvelle voiture dans ${left} s`:'Nouvelle voiture dans 1 s';
+    if(p.deadT>=RESPAWN_DELAY)respawnPlayer()}
   $('#dmgTxt').style.color=dmg>=75?'var(--accent)':'';
   engineSound(p,inp.gas?1:0,!muted&&!p.dead);
   sky.position.copy(camera.position);
