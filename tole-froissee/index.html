@@ -382,7 +382,7 @@ function buildBodyParts(sp,S){
   const GL=rgb(sp.tint===1?'#06080b':sp.tint===2?'#5a6672':'#2a3a46'),GT=rgb(sp.tint===1?'#0a0d11':sp.tint===2?'#8794a0':'#3c5263');
   const C1=rgb(sp.color),C2=sp.color2?rgb(sp.color2):C1,ST=sp.stripe?rgb(sp.stripe):null;
   // --- caisse basse
-  const SX=12,SY=9,SZ=30;
+  const SX=16,SY=10,SZ=38;
   const lower=boxPart(SX,SY,SZ,(fx,fy,s,v)=>{
     const z=S.zAt(s,fy),b=S.bottom(s),t=S.top(s),y=b+fy*(t-b);
     const hw=S.hwBase(s,fy)+S.flareAt(z,fy);let x=(fx-.5)*2*hw;
@@ -503,6 +503,7 @@ function buildDetailGeo(sp,S){
   const rear=(geo,col,x,y,dz=.006)=>add(geo,col,x,y,zR(y)-dz,tiltR,Math.PI,0,'YXZ');
   const HL='#fff0bf',BL='#ff2416';
   const glowF=(geo,x,y,dz=.017)=>{tgt=GH;front(geo,HL,x,y,dz);tgt=null},glowR=(geo,x,y,dz=.017)=>{tgt=GB;rear(geo,BL,x,y,dz);tgt=null};
+  const xf=(x,y,z,rx,ry,ord)=>new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx,ry,0,ord)),new THREE.Vector3(1,1,1));
   const yL=b0+hF*sp.ly, P=(w,h)=>new THREE.PlaneGeometry(w,h), Ci=(r,n=18)=>new THREE.CircleGeometry(r,n);
   const bodyC=sp.color;
   // ---- phares
@@ -542,11 +543,16 @@ function buildDetailGeo(sp,S){
     add(new THREE.BoxGeometry(2*hwR+.1,.1,.13,16,1,1),bc,0,byR,zR(byR)-.035);
     add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,hwF+.03,byF,zF(byF)-.2);add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,-hwF-.03,byF,zF(byF)-.2);}
   const plateZ=sp.bumper!=='body'?.105:.008,yPF=sp.bumper!=='body'?byF:b0+hF*.22,ryP=b1+hR*.44;
-  const xf=(x,y,z,rx,ry,ord)=>new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(rx,ry,0,ord)),new THREE.Vector3(1,1,1));
   const plates=[xf(0,yPF,zF(yPF)+plateZ,tiltF,0,'XYZ'),xf(0,ryP,zR(ryP)-.009,tiltR,Math.PI,'YXZ')];
   front(P(.54,.125),'#1a1b1d',0,yPF,plateZ-.002);rear(P(.54,.125),'#1a1b1d',0,ryP,.006);
   // ---- feux arrière
   const yT=b1+hR*.66;
+  // emplacements des badges : capot ou calandre à l'avant, hayon à l'arrière, nom du modèle sur le coffre
+  const onHood=['kidney','mb','chrome','slats'].includes(sp.grille);
+  const hoodBadge=()=>{const s=.035,sl=(S.top(s+.02)-S.top(s-.02))/(.04*L);return xf(0,S.top(s)+.01,S.zAt(s,1),-Math.PI/2+Math.atan(sl),0,'XYZ')};
+  const badges=[onHood?hoodBadge():xf(0,sp.grille==='none'?b0+hF*.5:gy,zF(sp.grille==='none'?b0+hF*.5:gy)+.024,tiltF,0,'XYZ')];
+  const ryB=yT+.13<t1-.03?yT+.13:yT-.13;badges.push(xf(0,ryB,zR(ryB)-.012,tiltR,Math.PI,'YXZ'));
+  const nameAt=xf(-hwR*.58,Math.max(b1+.12,yT-.13),zR(Math.max(b1+.12,yT-.13))-.012,tiltR,Math.PI,'YXZ');
   for(const sg of [-1,1]){
     switch(sp.tailL){
       case 'band':rear(P(hwR*.86,.12),K.red,sg*hwR*.53,yT);glowR(P(hwR*.5,.11),sg*hwR*.56,yT);rear(P(hwR*.2,.11),K.amber,sg*hwR*.82,yT,.009);rear(P(hwR*.12,.11),K.white,sg*hwR*.3,yT,.009);break;
@@ -560,7 +566,12 @@ function buildDetailGeo(sp,S){
   for(const az of [S.axF,S.axR])for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
     const x=sg*(S.hwBase(s,Math.max(.25,fy))+S.flareAt(az,.5)+.004);
     add(new THREE.CircleGeometry(sp.wr+.075,22,0,Math.PI),K.arch,x,sp.wr,az,0,sg*Math.PI/2,0,'YXZ');
-    add(new THREE.PlaneGeometry(2*(sp.wr+.075),Math.max(.01,sp.wr-S.bottom(s)+.02)),K.arch,x,(sp.wr+S.bottom(s)-.02)/2,az,0,sg*Math.PI/2,0,'YXZ')}
+    add(new THREE.PlaneGeometry(2*(sp.wr+.075),Math.max(.01,sp.wr-S.bottom(s)+.02)),K.arch,x,(sp.wr+S.bottom(s)-.02)/2,az,0,sg*Math.PI/2,0,'YXZ');
+    add(new THREE.RingGeometry(sp.wr+.07,sp.wr+.115,24,1,0,Math.PI),sp.color,x+sg*.006,sp.wr,az,0,sg*Math.PI/2,0,'YXZ')}
+  // enjoliveurs chromés autour des vitres (voitures anciennes) / joints noirs (récentes)
+  if(!sp.open&&sp.ws>.05){const trim=sp.year<1992?K.chrome:'#111214',n=8,s1=sp.ws+.02,s2=sp.rw-.02;
+    for(let i=0;i<n;i++){const sa=s1+(s2-s1)*i/n,sb=s1+(s2-s1)*(i+1)/n,sm=(sa+sb)/2,ya=S.top(sa),yb=S.top(sb),len=Math.hypot((sb-sa)*L,yb-ya);
+      for(const sg of [-1,1])add(new THREE.PlaneGeometry(len,.03),trim,sg*(S.hwBase(sm,1)*.99+.006),(ya+yb)/2+.012,S.zAt(sm,1),0,sg*Math.PI/2,sg*Math.atan2(yb-ya,(sb-sa)*L),'YXZ')}}
   // échappement
   add(new THREE.CylinderGeometry(.035,.035,.18,8),'#4a4c50',hwR*.55,b1+.03,-L/2-.03,Math.PI/2);
   // ---- rétroviseurs & poignées
@@ -610,7 +621,7 @@ function buildDetailGeo(sp,S){
   else if(!sp.open)add(new THREE.BoxGeometry(.06,.05,.15),'#141517',0,sp.H+.02,sp.L/2-sp.roofR*sp.L+.1);
   // ---- trappe à essence
   if(!sp.open){const s=sp.rw<.93?sp.rw+.02:sp.roofR-.02,y=S.top(s)-.14;add(new THREE.CircleGeometry(.075,14),'#141517',-(sideX(s,.8)+.002),y,S.zAt(s,.8),0,-Math.PI/2,0,'YXZ');add(new THREE.CircleGeometry(.065,14),sp.color,-(sideX(s,.8)+.004),y,S.zAt(s,.8),0,-Math.PI/2,0,'YXZ')}
-  return{plates,det:mergeGeos(list),gh:GH.length?mergeGeos(GH):null,gb:GB.length?mergeGeos(GB):null};
+  return{plates,badges,nameAt,det:mergeGeos(list),gh:GH.length?mergeGeos(GH):null,gb:GB.length?mergeGeos(GB):null};
 }
 
 function buildWheelGeo(sp){
@@ -656,6 +667,47 @@ const MAT_SHADOW=new THREE.MeshBasicMaterial({map:SHADOW_TEX,transparent:true,de
 let UID=0;
 // plaques d'immatriculation (format français, bande bleue « F »)
 const PLATES={};
+// badges inspirés des marques (formes, couleurs et initiales — pas les logos officiels)
+const BADGES={
+ 'BMW':{shape:'circle',bg:'#1c69d4',ring:'#111',fg:'#fff',t:'BMW'},'Mercedes-Benz':{shape:'circle',bg:'#20232a',ring:'#cfd3d8',fg:'#e6e9ee',t:'MB'},
+ 'Volkswagen':{shape:'circle',bg:'#1b3a8c',ring:'#e6e9ee',fg:'#fff',t:'VW'},'Audi':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'AUDI',w:2.4},
+ 'Peugeot':{shape:'shield',bg:'#1a1f3a',ring:'#cfd3d8',fg:'#e6e9ee',t:'P'},'Renault':{shape:'diamond',bg:'#d8b31b',ring:'#e6e9ee',fg:'#111',t:'R'},
+ 'Citroën':{shape:'oval',bg:'#9a1b20',ring:'#e6e9ee',fg:'#fff',t:'C',w:1.4},'Porsche':{shape:'shield',bg:'#d9a521',ring:'#2a2a2a',fg:'#a0141b',t:'P'},
+ 'Ferrari':{shape:'shield',bg:'#f2c40f',ring:'#111',fg:'#111',t:'F'},'Lamborghini':{shape:'shield',bg:'#111',ring:'#c9a43a',fg:'#c9a43a',t:'L'},
+ 'Toyota':{shape:'oval',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'T',w:1.4},'Nissan':{shape:'circle',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'NISSAN',band:1},
+ 'Honda':{shape:'rect',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'H',w:1.2},'Mazda':{shape:'oval',bg:'#30343a',ring:'#cfd3d8',fg:'#e6e9ee',t:'M',w:1.3},
+ 'Ford':{shape:'oval',bg:'#1c3f94',ring:'#e6e9ee',fg:'#fff',t:'Ford',w:2.1,script:1},'Chevrolet':{shape:'rect',bg:'#d9a521',ring:'#8a6a1a',fg:'#2a1f0a',t:'CHEVY',w:2.2},
+ 'Lancia':{shape:'shield',bg:'#1f3f8c',ring:'#e6e9ee',fg:'#fff',t:'L'},'Volvo':{shape:'circle',bg:'#2a3a5c',ring:'#cfd3d8',fg:'#e6e9ee',t:'VOLVO'},
+ 'Fiat':{shape:'rect',bg:'#9a1b20',ring:'#e6e9ee',fg:'#fff',t:'FIAT',w:1.8},'Lada':{shape:'oval',bg:'#1f3f8c',ring:'#e6e9ee',fg:'#fff',t:'LADA',w:1.5},
+ 'Alpine':{shape:'circle',bg:'#1f55b0',ring:'#e6e9ee',fg:'#fff',t:'A'},'Mitsubishi':{shape:'diamond',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'M'},
+ 'Subaru':{shape:'oval',bg:'#1b3a8c',ring:'#e6e9ee',fg:'#fff',t:'SUBARU',w:1.7},'Dodge':{shape:'rect',bg:'#c41b1b',ring:'#111',fg:'#fff',t:'DODGE',w:2.2},
+ 'Mini':{shape:'circle',bg:'#111',ring:'#e6e9ee',fg:'#fff',t:'MINI',wings:1},'Jeep':{shape:'rect',bg:'#2f4a2a',ring:'#cfd3d8',fg:'#fff',t:'JEEP',w:2},
+ 'Land Rover':{shape:'oval',bg:'#1e5a32',ring:'#d9a521',fg:'#fff',t:'LAND ROVER',w:2},'Bugatti':{shape:'oval',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'EB',w:1.5},
+ 'McLaren':{shape:'rect',bg:'#111',ring:'#f08a12',fg:'#f08a12',t:'McLAREN',w:2.6},'Aston Martin':{shape:'rect',bg:'#1e3f2a',ring:'#cfd3d8',fg:'#e6e9ee',t:'ASTON',w:2.4,wings:1},
+ 'Jaguar':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'JAGUAR',w:2.4},'Opel':{shape:'circle',bg:'#f2c40f',ring:'#111',fg:'#111',t:'OPEL'},
+ 'Seat':{shape:'rect',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'S',w:1.1},'Skoda':{shape:'circle',bg:'#2b8a3e',ring:'#111',fg:'#fff',t:'SKODA'},
+ 'Hummer':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'HUMMER',w:2.6},'Smart':{shape:'rect',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'smart',w:2},
+ 'Lotus':{shape:'circle',bg:'#f2c40f',ring:'#1e5a32',fg:'#1e5a32',t:'LOTUS'},'DeLorean':{shape:'rect',bg:'#9aa0a8',ring:'#e6e9ee',fg:'#111',t:'DMC',w:1.8},
+};
+const BADGE_MATS={};
+function badgeMat(brand){if(BADGE_MATS[brand])return BADGE_MATS[brand];const d=BADGES[brand]||{shape:'circle',bg:'#888',ring:'#ddd',fg:'#fff',t:brand[0]};
+  const W=256*(d.w||1)|0,H=256,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
+  const path=()=>{g.beginPath();if(d.shape==='circle')g.arc(W/2,H/2,H*.46,0,7);else if(d.shape==='oval')g.ellipse(W/2,H/2,W*.47,H*.4,0,0,7);
+    else if(d.shape==='diamond'){g.moveTo(W/2,H*.04);g.lineTo(W*.84,H/2);g.lineTo(W/2,H*.96);g.lineTo(W*.16,H/2);g.closePath()}
+    else if(d.shape==='shield'){g.moveTo(W*.14,H*.08);g.lineTo(W*.86,H*.08);g.lineTo(W*.86,H*.52);g.quadraticCurveTo(W*.84,H*.84,W/2,H*.96);g.quadraticCurveTo(W*.16,H*.84,W*.14,H*.52);g.closePath()}
+    else{const r=H*.18;g.moveTo(W*.04+r,H*.2);g.arcTo(W*.96,H*.2,W*.96,H*.8,r);g.arcTo(W*.96,H*.8,W*.04,H*.8,r);g.arcTo(W*.04,H*.8,W*.04,H*.2,r);g.arcTo(W*.04,H*.2,W*.96,H*.2,r);g.closePath()}};
+  path();g.fillStyle=d.ring;g.fill();g.save();g.translate(W/2,H/2);g.scale(.84,.84);g.translate(-W/2,-H/2);path();g.fillStyle=d.bg;g.fill();
+  if(d.bg2){g.clip();g.fillStyle=d.bg2;g.fillRect(W/2,0,W/2,H/2);g.fillRect(0,H/2,W/2,H/2)}g.restore();
+  if(d.band){g.fillStyle=d.ring;g.fillRect(W*.04,H*.4,W*.92,H*.2)}
+  g.fillStyle=d.bg2?'#111':d.fg;g.textAlign='center';g.textBaseline='middle';let fs=d.t.length<=2?H*.5:H*.3;g.font=`${d.script?'italic ':''}bold ${fs}px 'Chakra Petch',Arial,sans-serif`;
+  while(g.measureText(d.t).width>W*.78&&fs>20){fs-=4;g.font=`${d.script?'italic ':''}bold ${fs}px 'Chakra Petch',Arial,sans-serif`}
+  if(d.bg2){g.fillStyle='#fff';g.font=`bold ${H*.15}px Arial,sans-serif`;g.fillText(d.t,W/2,H*.13)}else g.fillText(d.t,W/2,H/2+fs*.04);
+  const t=srgbTex(new THREE.CanvasTexture(c));t.anisotropy=4;const m=new THREE.MeshPhongMaterial({map:t,transparent:true,alphaTest:.3,side:THREE.DoubleSide,shininess:90,specular:0x888888});m.userData.lin=1;return BADGE_MATS[brand]=m}
+const NAME_MATS={};
+function nameMat(name){if(NAME_MATS[name])return NAME_MATS[name];const c=document.createElement('canvas');c.width=512;c.height=96;const g=c.getContext('2d');
+  let fs=64;g.font=`italic bold ${fs}px 'Chakra Petch',Arial,sans-serif`;while(g.measureText(name).width>490&&fs>24){fs-=4;g.font=`italic bold ${fs}px 'Chakra Petch',Arial,sans-serif`}
+  g.textAlign='center';g.textBaseline='middle';g.fillStyle='rgba(0,0,0,.55)';g.fillText(name,258,51);const gr=g.createLinearGradient(0,20,0,76);gr.addColorStop(0,'#ffffff');gr.addColorStop(.5,'#b9bec6');gr.addColorStop(1,'#eef0f3');g.fillStyle=gr;g.fillText(name,256,48);
+  const t=srgbTex(new THREE.CanvasTexture(c));t.anisotropy=4;const m=new THREE.MeshPhongMaterial({map:t,transparent:true,alphaTest:.35,side:THREE.DoubleSide,shininess:100,specular:0x999999});m.userData.lin=1;return NAME_MATS[name]=m}
 function randomPlate(){const L='ABCDEFGHJKLMNPRSTVWXYZ',l=()=>L[(Math.random()*L.length)|0];return l()+l()+'-'+String(100+(Math.random()*899|0))+'-'+l()+l()}
 function plateMat(text){text=String(text||'').toUpperCase().slice(0,10)||'AB-123-CD';if(PLATES[text])return PLATES[text];
   const c=document.createElement('canvas');c.width=512;c.height=110;const g=c.getContext('2d');
@@ -675,6 +727,10 @@ class Car{
     const pm=plateMat(sp.plate||randomPlate());
     for(const mx of DG.plates){const g=new THREE.PlaneGeometry(.52,.11);g.applyMatrix4(mx);const m=new THREE.Mesh(g,pm);this.body.add(m);
       this.plates.push({geo:g,P:g.attributes.position.array,O:g.attributes.position.array.slice(),m})}
+    const bd=BADGES[sp.brand]||{shape:'circle',bg:'#888',fg:'#fff',t:sp.brand[0]},bs=bd.size||.105,bm=badgeMat(sp.brand);
+    const extra=(g,mx,mat)=>{g.applyMatrix4(mx);const m=new THREE.Mesh(g,mat);this.body.add(m);this.plates.push({geo:g,P:g.attributes.position.array,O:g.attributes.position.array.slice(),m})};
+    DG.badges.forEach((mx,i)=>extra(new THREE.PlaneGeometry(bs*(bd.w||1)*(i?.85:1),bs*(i?.85:1)),mx,bm));
+    extra(new THREE.PlaneGeometry(.34,.064),DG.nameAt,nameMat(sp.name));
     for(const [g,kind] of [[DG.gh,'h'],[DG.gb,'b']])if(g){const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:kind==='h'?.55:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
       mat.userData.lin=1;const m=new THREE.Mesh(g,mat);this.body.add(m);this.glows.push({geo:g,P:g.attributes.position.array,O:g.attributes.position.array.slice(),mat,m,kind})}
     this.det={geo:dg,P:dg.attributes.position.array,O:dg.attributes.position.array.slice(),C0:dg.attributes.color.array.slice()};
