@@ -52,6 +52,12 @@ button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
 .card b{display:block;font-size:13px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .card small{display:block;font-size:11px;color:var(--mute);font-variant-numeric:tabular-nums}
 .card div{min-width:0}
+.card.lock{position:relative}.card .padlock{display:none;position:absolute;right:8px;top:8px;width:12px;height:12px;border:2px solid var(--mute);border-radius:3px}
+.card .padlock::before{content:"";position:absolute;left:1px;top:-8px;width:6px;height:7px;border:2px solid var(--mute);border-bottom:0;border-radius:5px 5px 0 0}
+.card.locked{opacity:.55}.card.locked .padlock{display:block}
+.tnote{margin:0 0 8px;font-size:11px;color:var(--mute)}
+#go:disabled{background:#3a3d45;color:#aab0bb}
+#unlChip{background:rgba(10,11,14,.6);border:1px solid #3ecf8e;border-radius:6px;padding:8px 10px;font-size:11px;font-weight:700;letter-spacing:.08em;color:#3ecf8e;font-variant-numeric:tabular-nums}
 .card.on{border-color:var(--accent);background:#2a1d17}
 #go{flex:none;margin:8px max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 10px) max(16px,env(safe-area-inset-left,0px));
   background:var(--accent);border:0;border-radius:8px;padding:14px;font-size:17px;font-weight:700;letter-spacing:.2em;color:#160800}
@@ -184,7 +190,7 @@ button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
   <div id="speedo"><b id="spd">0</b><small>KM/H</small></div>
   <div id="dmg"><small>DÉGÂTS <b id="dmgTxt">0%</b></small><div class="bar"><i id="dmgBar"></i></div></div>
   <div class="sp"></div>
-  <div id="netChip" hidden></div>
+  <div id="netChip" hidden></div><div id="unlChip" hidden></div>
   <div class="tools"><button id="hRepair">RÉPARER</button><button id="hCam">CAMÉRA</button><button id="hCtl">COMMANDES</button><button id="hSnd">SON</button></div>
 </div>
 <div id="ctl" hidden>
@@ -345,9 +351,24 @@ C('Smart','ForTwo',1998,61,730,135,X('mono',2.5,1.52,1.55,1.81,.27,{ws:.15,roofF
 C('Lotus','Elise S1',1996,118,725,200,X('roadster',3.73,1.72,1.2,2.3,.3,{trunk:.75*1.2,tail:.74*1.2,color:'#f2c40f',lights:'round2',grille:'single'})),
 C('DeLorean','DMC-12',1981,130,1230,200,X('sport',4.27,1.99,1.14,2.41,.33,{clr:.14,ws:.28,roofF:.46,roofR:.58,rw:.92,round:.04,tumble:.8,color:'#b9bdc1',lights:'rect',grille:'wide',tailL:'band'}))
 );
+// ---- CAMIONS (à débloquer) : cabine avancée + caisse de chargement + 3e essieu
+const TRUCK=(L,W,cabH,cabL,boxH,wb,wr,o)=>Object.assign({L,W,H:cabH,wb,wr,clr:.42,hoodF:1.22,hood:1.3,belt:1.3,trunk:1.3,tail:1.3,ws:.004,roofF:.004+.32/L,roofR:cabL/L-.02,rw:cabL/L,
+  nose:.03,tailSlope:0,round:.03,tumble:.95,fo:1.45,lights:'rect',ly:.5,grille:'slats',tailL:'small',bumper:'black',ww:.34,spokes:10,box:{s0:cabL/L+.012,h:boxH,color:'#e9eaec',stripe:null}},o||{});
+const TRUCKS=[
+C('Renault','Master',2015,165,2200,160,Object.assign(X('van',5.55,2.07,2.5,3.68,.36,{color:'#f2f3f1',lights:'slim',grille:'wide',bumper:'black'}),{truck:1})),
+C('Iveco','Daily Benne',2018,180,3500,150,Object.assign(TRUCK(6.0,2.1,2.55,1.9,1.95,3.75,.38,{color:'#e9eaec',box:{s0:.33,h:1.95,color:'#c8352a',stripe:null},ww:.24,ax3:0}),{truck:1})),
+C('Renault Trucks','T 480',2018,480,9500,90,Object.assign(TRUCK(8.6,2.5,3.6,2.3,3.9,4.6,.52,{color:'#c41b1b',box:{s0:.285,h:3.9,color:'#eceff1',stripe:'#c41b1b'},ax3:1.35}),{truck:1})),
+C('Volvo Trucks','FH16 750',2020,750,10200,90,Object.assign(TRUCK(9.2,2.5,3.75,2.4,4.0,4.9,.52,{color:'#1f3f8c',box:{s0:.275,h:4.0,color:'#1b2d5c',stripe:'#e9eaec'},ax3:1.35}),{truck:1})),
+C('Scania','R730 V8',2021,730,10000,90,Object.assign(TRUCK(9.0,2.5,3.7,2.35,4.0,4.8,.52,{color:'#b51219',box:{s0:.275,h:4.0,color:'#f2f3f1',stripe:'#b51219'},ax3:1.35}),{truck:1})),
+C('Mercedes-Benz','Actros 1863',2019,630,9800,90,Object.assign(TRUCK(9.0,2.5,3.7,2.35,4.0,4.8,.52,{color:'#b8bcc2',grille:'mb',box:{s0:.275,h:4.0,color:'#2a2c30',stripe:'#b8bcc2'},ax3:1.35}),{truck:1})),
+C('MAN','TGX 640',2020,640,9900,90,Object.assign(TRUCK(9.0,2.5,3.7,2.35,4.0,4.8,.52,{color:'#f2f3f1',box:{s0:.275,h:4.0,color:'#e8641e',stripe:null},ax3:1.35}),{truck:1})),
+C('Renault Trucks','Pompiers FPT',2016,320,14000,100,Object.assign(TRUCK(8.2,2.5,3.2,2.6,3.2,4.4,.5,{color:'#c41b1b',box:{s0:.33,h:3.2,color:'#c41b1b',stripe:'#f2f2ee'},ax3:0,lights:'rect'}),{truck:1})),
+];
+CARS.push(...TRUCKS);
 CARS.forEach(c=>{c.id=(c.brand+'-'+c.name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');
-  if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
-const BRANDS=[...new Set(CARS.map(c=>c.brand))].sort((a,b)=>a.localeCompare(b,'fr'));
+  c.truck=!!c.truck;if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
+const ROADCARS=CARS.filter(c=>!c.truck);
+const BRANDS=[...new Set(CARS.filter(c=>!c.truck).map(c=>c.brand))].sort((a,b)=>a.localeCompare(b,'fr'));
 
 /* =====================================================================
    GÉNÉRATION DES CARROSSERIES (maillages denses → déformables)
@@ -374,7 +395,8 @@ function makeShape(sp){
     if(sG<=sp.roofF){const t=clamp((sG-ws)/Math.max(1e-3,sp.roofF-ws),0,1),y0=top(ws);return y0+(H-y0)*(1-(1-t)**1.8)}
     if(sG<=sp.roofR)return H;
     const t=clamp((sG-sp.roofR)/Math.max(1e-3,rw-sp.roofR),0,1),y1=top(rw);return H-(H-y1)*t**1.6};
-  return {top,bottom,hwBase,flareAt,zAt,roof,axF,axR};
+  const axles=[axF,axR];if(sp.ax3)axles.push(axR-sp.ax3);
+  return {top,bottom,hwBase,flareAt,zAt,roof,axF,axR,axles};
 }
 
 // Boîte subdivisée remodelée : mapFn(fx,fy,u,out) → position, colorFn(face,fx,fy,u,x,y,z) → {c,g}
@@ -441,7 +463,14 @@ function buildBodyParts(sp,S){
     }
     return{c:body};
   });
-  return [lower,green];
+  const parts=[lower,green];
+  if(sp.box){const bx=sp.box,s0=bx.s0,BC=rgb(bx.color),SC=bx.stripe?rgb(bx.stripe):null,y0=sp.belt-.01,BX=10,BY=10,BZ=24;
+    parts.push(boxPart(BX,BY,BZ,(fx,fy,u,v)=>{const s=s0+u*(.997-s0);v.z=sp.L/2-s*sp.L;v.y=y0+fy*(bx.h-y0);let hw=sp.W/2*.99;if(fy>.94)hw*=1-.03*(fy-.94)/.06;v.x=(fx-.5)*2*hw},
+      (face,fx,fy,u)=>{if(face===2)return{c:rgb('#d6d8da')};if(face===3)return{c:rgb(K.under)};
+        if(face===5){const col=Math.floor(fx*BX);return{c:col===BX/2-1||col===BX/2?mul(BC,.7):mul(BC,.92)}}
+        if(face<=1&&SC){const row=Math.floor(fy*BY);if(row===2||row===3)return{c:SC}}
+        if(face<=1&&Math.floor(u*BZ)===0)return{c:mul(BC,.8)};return{c:BC}}))}
+  return parts;
 }
 
 function mergeParts(parts){
@@ -577,7 +606,7 @@ function buildDetailGeo(sp,S){
     }
   }
   // passages de roue
-  for(const az of [S.axF,S.axR])for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
+  for(const az of S.axles)for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
     const x=sg*(S.hwBase(s,Math.max(.25,fy))+S.flareAt(az,.5)+.004);
     add(new THREE.CircleGeometry(sp.wr+.075,22,0,Math.PI),K.arch,x,sp.wr,az,0,sg*Math.PI/2,0,'YXZ');
     add(new THREE.PlaneGeometry(2*(sp.wr+.075),Math.max(.01,sp.wr-S.bottom(s)+.02)),K.arch,x,(sp.wr+S.bottom(s)-.02)/2,az,0,sg*Math.PI/2,0,'YXZ');
@@ -702,6 +731,8 @@ const BADGES={
  'Jaguar':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'JAGUAR',w:2.4},'Opel':{shape:'circle',bg:'#f2c40f',ring:'#111',fg:'#111',t:'OPEL'},
  'Seat':{shape:'rect',bg:'#c41b1b',ring:'#e6e9ee',fg:'#fff',t:'S',w:1.1},'Skoda':{shape:'circle',bg:'#2b8a3e',ring:'#111',fg:'#fff',t:'SKODA'},
  'Hummer':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'HUMMER',w:2.6},'Smart':{shape:'rect',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'smart',w:2},
+ 'Renault Trucks':{shape:'diamond',bg:'#d8b31b',ring:'#e6e9ee',fg:'#111',t:'R',size:.22},'Volvo Trucks':{shape:'circle',bg:'#2a3a5c',ring:'#cfd3d8',fg:'#e6e9ee',t:'VOLVO',size:.26},
+ 'Scania':{shape:'circle',bg:'#1b2d5c',ring:'#cfd3d8',fg:'#fff',t:'SCANIA',size:.24},'MAN':{shape:'rect',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'MAN',w:1.8,size:.2},'Iveco':{shape:'oval',bg:'#1b3a8c',ring:'#e6e9ee',fg:'#fff',t:'IVECO',w:2,size:.16},
  'Lotus':{shape:'circle',bg:'#f2c40f',ring:'#1e5a32',fg:'#1e5a32',t:'LOTUS'},'DeLorean':{shape:'rect',bg:'#9aa0a8',ring:'#e6e9ee',fg:'#111',t:'DMC',w:1.8},
 };
 const BADGE_MATS={};
@@ -753,7 +784,7 @@ class Car{
     this.detMesh=new THREE.Mesh(dg,MAT_DET);this.body.add(this.detMesh);
     const wg=buildWheelGeo(sp),bg=buildBrakeGeo(sp);this.wheels=[];
     const wx=sp.W/2-sp.ww/2+.012+(sp.flare||0)*.75;
-    for(const [z,front] of [[S.axF,1],[S.axR,0]])for(const sg of [-1,1]){
+    for(const [z,front] of S.axles.map((z,i)=>[z,i===0?1:0]))for(const sg of [-1,1]){
       const pv=new THREE.Group();pv.rotation.order='YZX';pv.position.set(sg*wx,sp.wr,z);
       const m=new THREE.Mesh(wg,MAT_WHEEL);pv.add(m,new THREE.Mesh(bg,MAT_WHEEL));this.group.add(pv);this.wheels.push({pv,m,front,x:sg*wx,z,camber:0,sg})}
     const sh=new THREE.Mesh(new THREE.PlaneGeometry(sp.W*1.3,sp.L*1.12),MAT_SHADOW);sh.rotation.x=-Math.PI/2;sh.position.y=.02;this.group.add(sh);this.shadowM=sh;
@@ -1096,7 +1127,7 @@ function buildWorld(){
 
   function parking(cx,cz){blockPad(cx,cz,84,'#3b3d41');
     for(let row=0;row<4;row++){const z=cz-30+row*20;for(let i=0;i<14;i++){const x=cx-35+i*5.4;pad(.15,5,x,z+(row%2?-2.5:2.5),'#e6e6e0',.04)}
-      for(let i=0;i<13;i++)if(Math.random()<.22){const sp=CARS[(Math.random()*CARS.length)|0];spawnParked(sp,cx-32.3+i*5.4,z+(row%2?-2.6:2.6),row%2?0:Math.PI)}}}
+      for(let i=0;i<13;i++)if(Math.random()<.22){const sp=ROADCARS[(Math.random()*ROADCARS.length)|0];spawnParked(sp,cx-32.3+i*5.4,z+(row%2?-2.6:2.6),row%2?0:Math.PI)}}}
   function yard(cx,cz){blockPad(cx,cz,84,'#9a9488');const CC=['#b8452a','#2d5f8a','#3f7d4a','#d1a33a','#6b6f75'];
     for(let i=0;i<12;i++){const x=cx-32+Math.random()*64,z=cz-32+Math.random()*64;if(Math.abs(x-cx)<8&&Math.abs(z-cz)<8)continue;const a=Math.random()<.5?0:Math.PI/2;
       const c=CC[i%CC.length];box(2.44,2.6,6.1,x,1.3,z,a,c);for(let k=-2;k<=2;k++){const ca=Math.cos(a),sa=Math.sin(a);box(2.5,2.4,.06,x+sa*k*1.2,1.3,z+ca*k*1.2,a,c)}
@@ -1150,7 +1181,7 @@ function spawnTraffic(){
   const plan=[[0,0],[0,1.6],[0,2.9],[1,.5],[1,2.2],[2,.3],[2,2.1],[3,1.2],[3,3.1],[4,.7],[4,2.6],[5,1.5],[6,.4],[6,1.5],[6,2.8]];
   for(const [li,ofs] of plan){const loop=LOOPS[li];const seg=Math.floor(ofs)%loop.length,t=ofs-Math.floor(ofs);
     const A=loop[seg],B=loop[(seg+1)%loop.length];const x=lerp(A[0],B[0],t),z=lerp(A[1],B[1],t);
-    const sp=CARS[(Math.random()*CARS.length)|0];const c=new Car(sp);c.setPose(x,z,Math.atan2(B[0]-A[0],B[1]-A[1]));
+    const sp=ROADCARS[(Math.random()*ROADCARS.length)|0];const c=new Car(sp);c.setPose(x,z,Math.atan2(B[0]-A[0],B[1]-A[1]));
     c.ai={loop,wi:(seg+1)%loop.length,cruise:11+Math.random()*7,stuck:0,rev:0};cars.push(c);game.add(c.group)}
 }
 function aiInput(c,dt){
@@ -1551,12 +1582,38 @@ addEventListener('pointerdown',initAudio,{passive:true});addEventListener('keydo
 /* =====================================================================
    INTERFACE : garage
    ===================================================================== */
+// déblocage des camions : 15 min de jeu cumulées → camions disponibles 5 min, puis on recommence
+const UNL={play:+(store.get('tf_play')||0),left:+(store.get('tf_unl')||0),saveT:0,last:CARS.find(c=>c.id===store.get('tf_last')&&!c.truck)||CARS[0]};
+const PLAY_NEED=900,UNL_TIME=300,mmss=t=>{t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
+const trucksOpen=()=>UNL.left>0;
+function unlockTick(dt){
+  if(state==='game'&&player&&!player.dead){
+    if(UNL.left>0){UNL.left=Math.max(0,UNL.left-dt);if(UNL.left===0){toast('LES CAMIONS REPARTENT AU DÉPÔT');if(selected.truck)swapToCar(UNL.last)}}
+    else{UNL.play+=dt;if(UNL.play>=PLAY_NEED){UNL.play=0;UNL.left=UNL_TIME;toast('CAMIONS DÉBLOQUÉS PENDANT 5 MIN !')}}}
+  UNL.saveT+=dt;if(UNL.saveT>2){UNL.saveT=0;store.set('tf_play',UNL.play.toFixed(1));store.set('tf_unl',UNL.left.toFixed(1));updUnlockUI()}
+  const chip=$('#unlChip');if(state==='game'&&trucksOpen()){chip.hidden=false;chip.textContent='CAMIONS '+mmss(UNL.left)}else chip.hidden=true;
+}
+function updUnlockUI(){
+  const h=$('#truckState');if(h)h.textContent=trucksOpen()?'DÉBLOQUÉS · '+mmss(UNL.left):'VERROUILLÉS · encore '+mmss(PLAY_NEED-UNL.play)+' de jeu';
+  document.querySelectorAll('.card.lock').forEach(e=>e.classList.toggle('locked',!trucksOpen()));
+  const go=$('#go');const lock=selected.truck&&!trucksOpen();go.disabled=lock;go.textContent=lock?'VERROUILLÉ · '+mmss(PLAY_NEED-UNL.play):'CONDUIRE';
+}
+function swapToCar(c){selected=c;store.set('tf_car',c.id);selectCar(c);if(!player||state!=='game')return;
+  const x=player.x,z=player.z,a=player.a;game.remove(player.group);cars.splice(cars.indexOf(player),1);
+  player=new Car(specFor(c));player.setPose(x,z,a);cars.push(player);game.add(player.group);netReset()}
 let state='menu',selected=CARS.find(c=>c.id===store.get('tf_car'))||CARS[0];
 function buildMenu(){
   const bar=$('#brandBar'),list=$('#list');
+  {const btn=document.createElement('button');btn.textContent='Camions';btn.dataset.b='__trucks';btn.onclick=()=>{const sec=$('#b-camions');list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
+   const sec=document.createElement('section');sec.id='b-camions';sec.innerHTML=`<h3><span>CAMIONS</span><span id="truckState"></span></h3><p class="tnote">15 min de jeu débloquent les camions pendant 5 min.</p>`;
+   const grid=document.createElement('div');grid.className='cards';
+   for(const c of TRUCKS){const el=document.createElement('button');el.className='card lock';el.dataset.id=c.id;
+     el.innerHTML=`<span class="sw" style="background:${c.color}"></span><div><b>${c.brand} ${c.name}</b><small>${c.year} · ${c.hp} ch · ${(c.kg/1000).toFixed(1).replace('.',',')} t</small></div><em class="padlock" aria-hidden="true"></em>`;
+     el.onclick=()=>selectCar(c);grid.appendChild(el)}
+   sec.appendChild(grid);list.appendChild(sec)}
   for(const b of BRANDS){
     const btn=document.createElement('button');btn.textContent=b;btn.dataset.b=b;btn.onclick=()=>{const sec=document.getElementById('b-'+slug(b));list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
-    const sec=document.createElement('section');sec.id='b-'+slug(b);const cs=CARS.filter(c=>c.brand===b).sort((x,y)=>x.year-y.year);
+    const sec=document.createElement('section');sec.id='b-'+slug(b);const cs=CARS.filter(c=>c.brand===b&&!c.truck).sort((x,y)=>x.year-y.year);
     sec.innerHTML=`<h3><span>${b}</span><span>${cs.length}</span></h3>`;const grid=document.createElement('div');grid.className='cards';
     for(const c of cs){const el=document.createElement('button');el.className='card';el.dataset.id=c.id;
       el.innerHTML=`<span class="sw" style="background:${(customs[c.id]||{}).color||c.color}"></span><div><b>${c.name}</b><small>${c.year} · ${c.hp} ch</small></div>`;
@@ -1567,11 +1624,11 @@ function buildMenu(){
 }
 const slug=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');
 function selectCar(c){
-  selected=c;store.set('tf_car',c.id);
+  selected=c;store.set('tf_car',c.id);if(!c.truck){UNL.last=c;store.set('tf_last',c.id)}
   document.querySelectorAll('.card').forEach(e=>e.classList.toggle('on',e.dataset.id===c.id));
   $('#mBrand').textContent=c.brand;$('#mName').textContent=c.name;
   $('#mSpecs').innerHTML=[c.year,c.hp+' ch',c.kg+' kg',c.vmax+' km/h',(c.L).toFixed(2).replace('.',',')+' m'].map(s=>`<span>${s}</span>`).join('');
-  rebuildShow();renderCustom();
+  rebuildShow();renderCustom();updUnlockUI();
 }
 function rebuildShow(){if(showCar){show.remove(showCar.group)}showCar=new Car(specFor(selected));showCar.setPose(0,0,0);show.add(showCar.group);updShowDmg()}
 let customs={};try{customs=JSON.parse(store.get('tf_custom')||'{}')||{}}catch(e){customs={}}
@@ -1650,6 +1707,7 @@ let toastT=0;function toast(t){const e=$('#toast');e.textContent=t;e.classList.t
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 function openMenu(){state='menu';$('#ctlPick').hidden=true;$('#vig').hidden=true;$('#dead').hidden=true;$('#menu').hidden=false;$('#hud').hidden=true;$('#ctl').hidden=true;$('#kbd').hidden=true;if(eng)engineSound(null,0,false);resize()}
 function startGame(){
+  if(selected.truck&&!trucksOpen()){toast('CAMIONS VERROUILLÉS');return}
   $('#loading').hidden=false;
   setTimeout(()=>{
     if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();spawnTraffic()}finally{Math.random=r0}linearize(game)}
@@ -1726,10 +1784,10 @@ function frame(now){
       const hf=2*Math.atan(Math.tan(showCam.fov*Math.PI/360)*(land?Math.max(1,showCam.aspect*.58):showCam.aspect));
       const d=Math.max(sp.L*.6/Math.tan(hf/2),sp.H*1.1/Math.tan(showCam.fov*Math.PI/360*(land?1:.55)))+sp.L*.35;
       showCam.position.set(d*.62,sp.H*1.15+.9,d*.78);showCam.lookAt(0,sp.H*.42+showCar.group.position.y*.75,0)}
-    if(showCar)showCar.sync(dt);fxShow.update(dt);updShowDmg();netTick(dt);
+    if(showCar)showCar.sync(dt);fxShow.update(dt);updShowDmg();netTick(dt);unlockTick(dt);
     renderer.render(show,showCam);return;
   }
-  readInput(dt);if(player.dead){inp.gas=inp.brake=inp.steer=0}
+  unlockTick(dt);readInput(dt);if(player.dead){inp.gas=inp.brake=inp.steer=0}
   const sub=3,h=dt/sub;for(let i=0;i<sub;i++)physics(h,inp);
   for(const c of cars)c.sync(dt);
   updSparks(dt);fxGame.update(dt);respawnWrecks(dt);updTL(dt);
