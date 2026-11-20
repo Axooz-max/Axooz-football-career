@@ -365,10 +365,21 @@ C('MAN','TGX 640',2020,640,9900,90,Object.assign(TRUCK(9.0,2.5,3.7,2.35,4.0,4.8,
 C('Renault Trucks','Pompiers FPT',2016,320,14000,100,Object.assign(TRUCK(8.2,2.5,3.2,2.6,3.2,4.4,.5,{color:'#c41b1b',box:{s0:.33,h:3.2,color:'#c41b1b',stripe:'#f2f2ee'},ax3:0,lights:'rect'}),{truck:1})),
 ];
 CARS.push(...TRUCKS);
+// ---- MONSTER TRUCKS (à débloquer) : roues géantes, châssis surélevé
+const MONSTER=(L,W,o)=>Object.assign({L,W,H:2.8,wb:3.05,wr:.9,ww:.64,clr:1.15,hoodF:1.72,hood:1.88,belt:1.93,trunk:1.93,tail:1.88,ws:.26,roofF:.34,roofR:.53,rw:.56,
+  tumble:.93,nose:.03,tailSlope:0,round:.06,pickup:1,tailL:'vertical',bumper:'chrome',lights:'rect',grille:'slats',noArch:1,wheelOut:.42,spokes:6,rim:'#d9dce0'},o||{},{monster:1});
+const MONSTERS=[
+C('Ford','F-150 Monster',2022,1500,4800,130,MONSTER(5.6,2.4,{color:'#1c3f94',stripe:'#f2c40f'})),
+C('Chevrolet','Silverado Monster',2022,1500,4800,130,MONSTER(5.7,2.4,{color:'#e8641e',stripe:'#141414'})),
+C('Dodge','Ram Monster',2022,1500,4900,130,MONSTER(5.8,2.45,{color:'#1b1c1f',stripe:'#c41b1b'})),
+C('Toyota','Hilux Monster',2022,1200,4400,125,MONSTER(5.3,2.3,{color:'#c8b48a',stripe:'#2f4a2a'})),
+C('Monster Trucks','Tôle Froissée',2026,1800,5000,140,MONSTER(5.9,2.5,{color:'#ff5b1f',stripe:'#160800',rim:'#1a1b1d'})),
+];
+CARS.push(...MONSTERS);
 CARS.forEach(c=>{c.id=(c.brand+'-'+c.name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');
-  c.truck=!!c.truck;if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
-const ROADCARS=CARS.filter(c=>!c.truck);
-const BRANDS=[...new Set(CARS.filter(c=>!c.truck).map(c=>c.brand))].sort((a,b)=>a.localeCompare(b,'fr'));
+  c.truck=!!c.truck;c.monster=!!c.monster;if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
+const ROADCARS=CARS.filter(c=>!c.truck&&!c.monster);
+const BRANDS=[...new Set(CARS.filter(c=>!c.truck&&!c.monster).map(c=>c.brand))].sort((a,b)=>a.localeCompare(b,'fr'));
 
 /* =====================================================================
    GÉNÉRATION DES CARROSSERIES (maillages denses → déformables)
@@ -606,7 +617,7 @@ function buildDetailGeo(sp,S){
     }
   }
   // passages de roue
-  for(const az of S.axles)for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
+  if(!sp.noArch)for(const az of S.axles)for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
     const x=sg*(S.hwBase(s,Math.max(.25,fy))+S.flareAt(az,.5)+.004);
     add(new THREE.CircleGeometry(sp.wr+.075,22,0,Math.PI),K.arch,x,sp.wr,az,0,sg*Math.PI/2,0,'YXZ');
     add(new THREE.PlaneGeometry(2*(sp.wr+.075),Math.max(.01,sp.wr-S.bottom(s)+.02)),K.arch,x,(sp.wr+S.bottom(s)-.02)/2,az,0,sg*Math.PI/2,0,'YXZ');
@@ -639,6 +650,13 @@ function buildDetailGeo(sp,S){
   if(sp.spare){const y=b1+hR*.55;add(new THREE.CylinderGeometry(sp.wr*.92,sp.wr*.92,.22,18),K.tire,0,y,-L/2-.11,Math.PI/2);add(new THREE.CircleGeometry(sp.wr*.55,14),sp.rim,0,y,-L/2-.222,0,Math.PI)}
   // ---- cabriolet : sièges
   if(sp.open)for(const sg of [-1,1]){const s=sp.roofF+.17;add(new THREE.BoxGeometry(.42,.5,.12),K.interior,sg*.3,S.top(s)+.18,S.zAt(s,1));add(new THREE.BoxGeometry(.2,.14,.1),'#1a1614',sg*.3,S.top(s)+.5,S.zAt(s,1)-.02)}
+  // ---- monster truck : châssis, essieux, amortisseurs, barre de toit
+  if(sp.monster){const yc=sp.clr-.12,tw=sp.W/2+(sp.wheelOut||0);
+    for(const sg of [-1,1])add(new THREE.BoxGeometry(.16,.22,L*.86),'#1c1d20',sg*sp.W*.3,yc,0);
+    for(const az of S.axles){add(new THREE.CylinderGeometry(.09,.09,tw*2-.3,10),'#2d3034',0,sp.wr,az,0,0,Math.PI/2);add(new THREE.BoxGeometry(.5,.35,.4),'#3a3d42',0,sp.wr,az);
+      for(const sg of [-1,1])for(const dz of [-.25,.25]){const x0=sg*(tw-.55),x1=sg*sp.W*.3,y0=sp.wr+.05,y1=yc+.05,ln=Math.hypot(x1-x0,y1-y0);
+        add(new THREE.CylinderGeometry(.06,.06,ln,8),'#f2c40f',(x0+x1)/2,(y0+y1)/2,az+dz,0,0,-Math.atan2(x1-x0,y1-y0))}}
+    const sr=sp.roofF+.04;for(let i=0;i<4;i++)add(new THREE.BoxGeometry(.16,.1,.1),'#fff4cf',(i-1.5)*.32,sp.H+.07,S.zAt(sr,1));add(new THREE.BoxGeometry(sp.W*.8,.06,.08),'#1c1d20',0,sp.H+.02,S.zAt(sr,1))}
   // ---- habitacle visible à travers les vitres
   if(!sp.open&&sp.ws>.05){const IC='#34302c',sF=Math.min(sp.roofF+.07,(sp.roofF+sp.roofR)/2),yb=S.top(sF),hA=Math.max(.3,sp.H-yb);
     for(const sg of [-1,1]){const x=sg*sp.W*.22,z=S.zAt(sF,1);add(new THREE.BoxGeometry(.44,.1,.44),IC,x,yb+.05,z);add(new THREE.BoxGeometry(.44,hA*.55,.1),IC,x,yb+hA*.3,z-.24,-.12);add(new THREE.BoxGeometry(.22,.12,.09),'#24211e',x,yb+hA*.68,z-.27)}
@@ -733,6 +751,7 @@ const BADGES={
  'Hummer':{shape:'rect',bg:'#111',ring:'#cfd3d8',fg:'#e6e9ee',t:'HUMMER',w:2.6},'Smart':{shape:'rect',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'smart',w:2},
  'Renault Trucks':{shape:'diamond',bg:'#d8b31b',ring:'#e6e9ee',fg:'#111',t:'R',size:.22},'Volvo Trucks':{shape:'circle',bg:'#2a3a5c',ring:'#cfd3d8',fg:'#e6e9ee',t:'VOLVO',size:.26},
  'Scania':{shape:'circle',bg:'#1b2d5c',ring:'#cfd3d8',fg:'#fff',t:'SCANIA',size:.24},'MAN':{shape:'rect',bg:'#e6e9ee',ring:'#9aa0a8',fg:'#222',t:'MAN',w:1.8,size:.2},'Iveco':{shape:'oval',bg:'#1b3a8c',ring:'#e6e9ee',fg:'#fff',t:'IVECO',w:2,size:.16},
+ 'Monster Trucks':{shape:'shield',bg:'#ff5b1f',ring:'#111',fg:'#111',t:'TF',size:.16},
  'Lotus':{shape:'circle',bg:'#f2c40f',ring:'#1e5a32',fg:'#1e5a32',t:'LOTUS'},'DeLorean':{shape:'rect',bg:'#9aa0a8',ring:'#e6e9ee',fg:'#111',t:'DMC',w:1.8},
 };
 const BADGE_MATS={};
@@ -783,21 +802,21 @@ class Car{
     this.body.position.y=(sp.stance||0)*.06;
     this.detMesh=new THREE.Mesh(dg,MAT_DET);this.body.add(this.detMesh);
     const wg=buildWheelGeo(sp),bg=buildBrakeGeo(sp);this.wheels=[];
-    const wx=sp.W/2-sp.ww/2+.012+(sp.flare||0)*.75;
+    const wx=sp.W/2-sp.ww/2+.012+(sp.flare||0)*.75+(sp.wheelOut||0);
     for(const [z,front] of S.axles.map((z,i)=>[z,i===0?1:0]))for(const sg of [-1,1]){
       const pv=new THREE.Group();pv.rotation.order='YZX';pv.position.set(sg*wx,sp.wr,z);
       const m=new THREE.Mesh(wg,MAT_WHEEL);pv.add(m,new THREE.Mesh(bg,MAT_WHEEL));this.group.add(pv);this.wheels.push({pv,m,front,x:sg*wx,z,camber:0,sg})}
     const sh=new THREE.Mesh(new THREE.PlaneGeometry(sp.W*1.3,sp.L*1.12),MAT_SHADOW);sh.rotation.x=-Math.PI/2;sh.position.y=.02;this.group.add(sh);this.shadowM=sh;
     // physique
     this.x=0;this.z=0;this.a=0;this.vx=0;this.vz=0;this.w=0;this.steer=0;this.spin=0;this.vF=0;this.acc=0;this.latA=0;
-    this.m=sp.kg;this.I=sp.kg*(sp.L*sp.L+sp.W*sp.W)/12;this.hl=sp.L/2;this.hw=sp.W/2;this.r=Math.hypot(this.hl,this.hw);
+    this.m=sp.kg;this.I=sp.kg*(sp.L*sp.L+sp.W*sp.W)/12;this.hl=sp.L/2;this.hw=sp.W/2+(sp.wheelOut||0)*.85;this.r=Math.hypot(this.hl,this.hw);
     this.accel=1.6+.33*Math.sqrt(sp.hp/(sp.kg/1000));this.vmax=sp.vmax/3.6*.92;
     this.tRoll=0;this.tPit=0;this.tRollV=0;this.tPitV=0;this.flipped=false;this.flipT=0;
     this.y=0;this.vyA=0;this.fly=false;this.yv=0;this.rp=0;this.rr=0;this.rpT=0;this.rrT=0;this.gnd=0;
     this.wraps=[];
     this.cd=new Map();this.damage=0;this.roll=0;this.pitch=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.fxT=0;
   }
-  addDamage(v){if(this.dead||v<=0)return;const before=this.damage;this.damage=Math.min(100,this.damage+v);
+  addDamage(v){if(this.dead||v<=0)return;if(this.sp.monster)v*=.5;const before=this.damage;this.damage=Math.min(100,this.damage+v);
     if(this===player&&before<75&&this.damage>=75)toast('MOTEUR EN SURCHAUFFE');if(this.damage>=100)explode(this)}
   setPose(x,z,a){this.x=x;this.z=z;this.a=a;this.y=groundAt(x,z);this.fly=false;this.vyA=0;this.vx=this.vz=this.w=0;this.sync(0)}
   // impact en coordonnées monde (point, direction de l'enfoncement)
@@ -1307,6 +1326,9 @@ function impact(A,B,h,speed,obs){
   A.addDamage(power*.2*shA*(pole?1.2:1));
   if(B)B.addDamage(power*.2*clamp(2*A.m/(A.m+B.m),.35,1.65));
   if(B&&B.parked&&!B.dead)B.parked=false;
+  // un monster truck grimpe sur les voitures et leur écrase le toit
+  if(B&&speed>4)for(const [M,V] of [[A,B],[B,A]])if(M.sp.monster&&!V.sp.monster&&!V.isGhost){const ca=Math.cos(V.a),sa=Math.sin(V.a),rx=h.px-V.x,rz=h.pz-V.z;
+    V.dent(rx*ca-rz*sa,V.sp.H,rx*sa+rz*ca,0,-1,0,Math.min(.6,.15+speed*.03),1.3);V.addDamage(speed*.3);if(!M.fly&&!M.flipped&&!M.dead)takeoff(M,2.6+speed*.12);if(M===player&&speed>7)toast('ÉCRASÉE !')}
   rollKick(A,-h.nx,-h.nz,speed);if(B)rollKick(B,h.nx,h.nz,speed);
   const involved=A===player||B===player;
   if(speed>3.5)sparks(h.px,h.pz,Math.min(40,speed*1.6|0));
@@ -1355,7 +1377,7 @@ function physics(dt,inp){
     if(A===player)for(const g of NET.ghosts.values()){const G=g.car,dx=G.x-A.x,dz=G.z-A.z,rr=G.r+A.r;if(dx*dx+dz*dz>rr*rr||Math.abs(G.y-A.y)>1.1)continue;const h=sat(A,G);if(h)resolveGhost(A,G,h)}
     stamp++;const cx0=Math.floor((A.x-A.r)/CELL),cx1=Math.floor((A.x+A.r)/CELL),cz0=Math.floor((A.z-A.r)/CELL),cz1=Math.floor((A.z+A.r)/CELL);
     for(let cx=cx0;cx<=cx1;cx++)for(let cz=cz0;cz<=cz1;cz++){const l=grid.get(gkey(cx,cz));if(!l)continue;
-      for(const o of l){if(o.st===stamp)continue;o.st=stamp;const dx=o.x-A.x,dz=o.z-A.z,rr=A.r+o.r;if(dx*dx+dz*dz>rr*rr||A.y>o.h-.15)continue;if(o.ramp){const r=o.ramp;if((A.x-r.x)*r.s+(A.z-r.z)*r.c<r.len/2)continue}const h=sat(A,o);if(h)resolve(A,null,h,o)}}}
+      for(const o of l){if(o.st===stamp)continue;o.st=stamp;const dx=o.x-A.x,dz=o.z-A.z,rr=A.r+o.r;if(dx*dx+dz*dz>rr*rr||A.y>o.h-.15||(A.sp.monster&&o.h<=1.1))continue;if(o.ramp){const r=o.ramp;if((A.x-r.x)*r.s+(A.z-r.z)*r.c<r.len/2)continue}const h=sat(A,o);if(h)resolve(A,null,h,o)}}}
 }
 
 /* =====================================================================
@@ -1582,21 +1604,26 @@ addEventListener('pointerdown',initAudio,{passive:true});addEventListener('keydo
 /* =====================================================================
    INTERFACE : garage
    ===================================================================== */
-// déblocage des camions : 15 min de jeu cumulées → camions disponibles 5 min, puis on recommence
-const UNL={play:+(store.get('tf_play')||0),left:+(store.get('tf_unl')||0),saveT:0,last:CARS.find(c=>c.id===store.get('tf_last')&&!c.truck)||CARS[0]};
-const PLAY_NEED=900,UNL_TIME=300,mmss=t=>{t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
-const trucksOpen=()=>UNL.left>0;
+// déblocage : camions après 15 min de jeu (5 min), monster trucks après 30 min (10 min) ; chaque compteur recommence ensuite
+const GROUPS={
+  truck:{need:900,time:300,name:'CAMIONS',chip:'CAMIONS',open:'CAMIONS DÉBLOQUÉS PENDANT 5 MIN !',end:'LES CAMIONS REPARTENT AU DÉPÔT',kp:'tf_play',kl:'tf_unl',note:'15 min de jeu débloquent les camions pendant 5 min.'},
+  monster:{need:1800,time:600,name:'MONSTER TRUCKS',chip:'MONSTER',open:'MONSTER TRUCKS DÉBLOQUÉS PENDANT 10 MIN !',end:'LES MONSTER TRUCKS RENTRENT AU GARAGE',kp:'tf_play_m',kl:'tf_unl_m',note:'30 min de jeu débloquent les monster trucks pendant 10 min.'}};
+for(const g of Object.values(GROUPS)){g.play=+(store.get(g.kp)||0);g.left=+(store.get(g.kl)||0)}
+const groupOf=c=>c.truck?'truck':c.monster?'monster':null,isOpen=c=>{const k=groupOf(c);return !k||GROUPS[k].left>0};
+const UNL={saveT:0,last:CARS.find(c=>c.id===store.get('tf_last')&&!groupOf(c))||CARS[0]};
+const mmss=t=>{t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0')};
 function unlockTick(dt){
-  if(state==='game'&&player&&!player.dead){
-    if(UNL.left>0){UNL.left=Math.max(0,UNL.left-dt);if(UNL.left===0){toast('LES CAMIONS REPARTENT AU DÉPÔT');if(selected.truck)swapToCar(UNL.last)}}
-    else{UNL.play+=dt;if(UNL.play>=PLAY_NEED){UNL.play=0;UNL.left=UNL_TIME;toast('CAMIONS DÉBLOQUÉS PENDANT 5 MIN !')}}}
-  UNL.saveT+=dt;if(UNL.saveT>2){UNL.saveT=0;store.set('tf_play',UNL.play.toFixed(1));store.set('tf_unl',UNL.left.toFixed(1));updUnlockUI()}
-  const chip=$('#unlChip');if(state==='game'&&trucksOpen()){chip.hidden=false;chip.textContent='CAMIONS '+mmss(UNL.left)}else chip.hidden=true;
+  if(state==='game'&&player&&!player.dead)for(const [k,g] of Object.entries(GROUPS)){
+    if(g.left>0){g.left=Math.max(0,g.left-dt);if(g.left===0){toast(g.end);if(groupOf(selected)===k)swapToCar(UNL.last)}}
+    else{g.play+=dt;if(g.play>=g.need){g.play=0;g.left=g.time;toast(g.open)}}}
+  UNL.saveT+=dt;if(UNL.saveT>2){UNL.saveT=0;for(const g of Object.values(GROUPS)){store.set(g.kp,g.play.toFixed(1));store.set(g.kl,g.left.toFixed(1))}updUnlockUI()}
+  const chip=$('#unlChip'),txt=Object.values(GROUPS).filter(g=>g.left>0).map(g=>g.chip+' '+mmss(g.left)).join(' · ');
+  if(state==='game'&&txt){chip.hidden=false;chip.textContent=txt}else chip.hidden=true;
 }
 function updUnlockUI(){
-  const h=$('#truckState');if(h)h.textContent=trucksOpen()?'DÉBLOQUÉS · '+mmss(UNL.left):'VERROUILLÉS · encore '+mmss(PLAY_NEED-UNL.play)+' de jeu';
-  document.querySelectorAll('.card.lock').forEach(e=>e.classList.toggle('locked',!trucksOpen()));
-  const go=$('#go');const lock=selected.truck&&!trucksOpen();go.disabled=lock;go.textContent=lock?'VERROUILLÉ · '+mmss(PLAY_NEED-UNL.play):'CONDUIRE';
+  for(const [k,g] of Object.entries(GROUPS)){const h=document.getElementById('state-'+k);if(h)h.textContent=g.left>0?'DÉBLOQUÉS · '+mmss(g.left):'VERROUILLÉS · encore '+mmss(g.need-g.play)+' de jeu';
+    document.querySelectorAll('.card.lock[data-g="'+k+'"]').forEach(e=>e.classList.toggle('locked',!(g.left>0)))}
+  const go=$('#go'),k=groupOf(selected),lock=k&&!(GROUPS[k].left>0);go.disabled=!!lock;go.textContent=lock?'VERROUILLÉ · '+mmss(GROUPS[k].need-GROUPS[k].play):'CONDUIRE';
 }
 function swapToCar(c){selected=c;store.set('tf_car',c.id);selectCar(c);if(!player||state!=='game')return;
   const x=player.x,z=player.z,a=player.a;game.remove(player.group);cars.splice(cars.indexOf(player),1);
@@ -1604,16 +1631,17 @@ function swapToCar(c){selected=c;store.set('tf_car',c.id);selectCar(c);if(!playe
 let state='menu',selected=CARS.find(c=>c.id===store.get('tf_car'))||CARS[0];
 function buildMenu(){
   const bar=$('#brandBar'),list=$('#list');
-  {const btn=document.createElement('button');btn.textContent='Camions';btn.dataset.b='__trucks';btn.onclick=()=>{const sec=$('#b-camions');list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
-   const sec=document.createElement('section');sec.id='b-camions';sec.innerHTML=`<h3><span>CAMIONS</span><span id="truckState"></span></h3><p class="tnote">15 min de jeu débloquent les camions pendant 5 min.</p>`;
+  for(const [k,label,list2] of [['truck','Camions',TRUCKS],['monster','Monster trucks',MONSTERS]]){const g=GROUPS[k];
+   const btn=document.createElement('button');btn.textContent=label;btn.dataset.b='__'+k;btn.onclick=()=>{const sec=document.getElementById('b-'+k);list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
+   const sec=document.createElement('section');sec.id='b-'+k;sec.innerHTML=`<h3><span>${g.name}</span><span id="state-${k}"></span></h3><p class="tnote">${g.note}</p>`;
    const grid=document.createElement('div');grid.className='cards';
-   for(const c of TRUCKS){const el=document.createElement('button');el.className='card lock';el.dataset.id=c.id;
-     el.innerHTML=`<span class="sw" style="background:${c.color}"></span><div><b>${c.brand} ${c.name}</b><small>${c.year} · ${c.hp} ch · ${(c.kg/1000).toFixed(1).replace('.',',')} t</small></div><em class="padlock" aria-hidden="true"></em>`;
+   for(const c of list2){const el=document.createElement('button');el.className='card lock';el.dataset.id=c.id;el.dataset.g=k;
+     el.innerHTML=`<span class="sw" style="background:${c.color}"></span><div><b>${c.brand==='Monster Trucks'?c.name:c.brand+' '+c.name}</b><small>${c.year} · ${c.hp} ch · ${(c.kg/1000).toFixed(1).replace('.',',')} t</small></div><em class="padlock" aria-hidden="true"></em>`;
      el.onclick=()=>selectCar(c);grid.appendChild(el)}
    sec.appendChild(grid);list.appendChild(sec)}
   for(const b of BRANDS){
     const btn=document.createElement('button');btn.textContent=b;btn.dataset.b=b;btn.onclick=()=>{const sec=document.getElementById('b-'+slug(b));list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
-    const sec=document.createElement('section');sec.id='b-'+slug(b);const cs=CARS.filter(c=>c.brand===b&&!c.truck).sort((x,y)=>x.year-y.year);
+    const sec=document.createElement('section');sec.id='b-'+slug(b);const cs=CARS.filter(c=>c.brand===b&&!groupOf(c)).sort((x,y)=>x.year-y.year);
     sec.innerHTML=`<h3><span>${b}</span><span>${cs.length}</span></h3>`;const grid=document.createElement('div');grid.className='cards';
     for(const c of cs){const el=document.createElement('button');el.className='card';el.dataset.id=c.id;
       el.innerHTML=`<span class="sw" style="background:${(customs[c.id]||{}).color||c.color}"></span><div><b>${c.name}</b><small>${c.year} · ${c.hp} ch</small></div>`;
@@ -1624,7 +1652,7 @@ function buildMenu(){
 }
 const slug=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');
 function selectCar(c){
-  selected=c;store.set('tf_car',c.id);if(!c.truck){UNL.last=c;store.set('tf_last',c.id)}
+  selected=c;store.set('tf_car',c.id);if(!groupOf(c)){UNL.last=c;store.set('tf_last',c.id)}
   document.querySelectorAll('.card').forEach(e=>e.classList.toggle('on',e.dataset.id===c.id));
   $('#mBrand').textContent=c.brand;$('#mName').textContent=c.name;
   $('#mSpecs').innerHTML=[c.year,c.hp+' ch',c.kg+' kg',c.vmax+' km/h',(c.L).toFixed(2).replace('.',',')+' m'].map(s=>`<span>${s}</span>`).join('');
@@ -1707,7 +1735,7 @@ let toastT=0;function toast(t){const e=$('#toast');e.textContent=t;e.classList.t
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
 function openMenu(){state='menu';$('#ctlPick').hidden=true;$('#vig').hidden=true;$('#dead').hidden=true;$('#menu').hidden=false;$('#hud').hidden=true;$('#ctl').hidden=true;$('#kbd').hidden=true;if(eng)engineSound(null,0,false);resize()}
 function startGame(){
-  if(selected.truck&&!trucksOpen()){toast('CAMIONS VERROUILLÉS');return}
+  if(!isOpen(selected)){toast(GROUPS[groupOf(selected)].name+' VERROUILLÉS');return}
   $('#loading').hidden=false;
   setTimeout(()=>{
     if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();spawnTraffic()}finally{Math.random=r0}linearize(game)}
