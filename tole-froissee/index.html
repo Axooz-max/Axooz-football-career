@@ -995,7 +995,7 @@ const PEOPLE=[];
 const SKIN=['#f1c7a4','#e0ac85','#c68863','#9c6644','#6e4630','#f5d6bc'],SHIRT=['#2c3e66','#8a1f1f','#2f5d3a','#111214','#d9d6cf','#c8781d','#5b2a7a','#3a6f8f'],PANTS=['#22262e','#3b3226','#1d2c45','#4a4a48'],HAIR=['#1a1410','#3b2618','#7a5a32','#d8c27a','#111'];
 function makePersonGeo(){const pick=a=>a[(Math.random()*a.length)|0],sk=pick(SKIN),sh=pick(SHIRT),pa=pick(PANTS),L=[];
   const b=(w,h,d,x,y,z,col,rx=0,rz=0)=>{const g=new THREE.BoxGeometry(w,h,d);g.rotateX(rx);g.rotateZ(rz);g.translate(x,y,z);L.push(paint(g,col))};
-  for(const sx of [-1,1]){b(.19,.86,.21,sx*.12,.48,0,pa);b(.21,.1,.31,sx*.12,.05,.04,'#1b1b1d')}
+  const legs=[-1,1].map(()=>mergeGeos([paint(new THREE.BoxGeometry(.19,.86,.21).translate(0,-.44,0),pa),paint(new THREE.BoxGeometry(.21,.1,.31).translate(0,-.87,.04),'#1b1b1d')]));
   b(.46,.1,.27,0,.93,0,'#2a1f16');            // ceinture
   b(.5,.52,.3,0,1.18,0,sh);b(.68,.2,.34,0,1.44,0,sh); // torse + épaules larges
   for(const sx of [-1,1])b(.17,.4,.18,sx*.36,1.24,.02,sh,0,sx*.12); // bras
@@ -1004,12 +1004,49 @@ function makePersonGeo(){const pick=a=>a[(Math.random()*a.length)|0],sk=pick(SKI
   const body=mergeGeos(L);
   const H=[paint(new THREE.IcosahedronGeometry(.135,1).translate(0,.0,0),sk),paint(new THREE.SphereGeometry(.142,10,6,0,Math.PI*2,0,Math.PI*.45).translate(0,.02,-.005),pick(HAIR)),
     paint(new THREE.BoxGeometry(.2,.045,.04).translate(0,.025,.12),'#0c0c0e')];  // lunettes noires
-  return{body,head:mergeGeos(H)}}
+  return{body,legs,head:mergeGeos(H)}}
 function addPerson(x,z,a,list){if(PEOPLE.some(p=>Math.hypot(p.x-x,p.z-z)<3)||cars.some(c=>Math.hypot(c.x-x,c.z-z)<4))return;
   const g=makePersonGeo(),mat=new THREE.MeshLambertMaterial({vertexColors:true}),grp=new THREE.Group(),body=new THREE.Mesh(g.body,mat),head=new THREE.Mesh(g.head,mat);
-  head.position.y=1.71;grp.add(body,head);body.castShadow=head.castShadow=SHADOWS;const sc=.97+Math.random()*.13;grp.scale.setScalar(sc);
-  grp.position.set(x,0,z);grp.rotation.y=a;game.add(grp);PEOPLE.push({x,z,a,grp,body,head,react:0,look:0,ph:Math.random()*6})}
+  head.position.y=1.71;grp.add(body,head);body.castShadow=head.castShadow=SHADOWS;
+  const legs=g.legs.map((lg,i)=>{const m=new THREE.Mesh(lg,mat);m.position.set((i?1:-1)*.12,.92,0);m.castShadow=SHADOWS;grp.add(m);return m});const sc=.97+Math.random()*.13;grp.scale.setScalar(sc);
+  grp.position.set(x,0,z);grp.rotation.y=a;game.add(grp);PEOPLE.push({x,z,a,grp,body,head,legs,react:0,look:0,ph:Math.random()*6,ox:x,oz:z,seg:null})}
 const ROADS=[-350,-250,-150,-50,50,150,250,350],HALF=410,RW=16;
+/* ---------- PIÉTONS : marchent sur les trottoirs, sautent sur le côté quand une voiture arrive ---------- */
+const PEDS=[];let PED_GEOS=null,PED_MAT=null;
+function pedGeos(){if(PED_GEOS)return PED_GEOS;PED_GEOS=[];const COATS=['#2c3e66','#8a1f1f','#2f5d3a','#d9d6cf','#c8781d','#5b2a7a','#3a6f8f','#d94f8c','#e2b21c','#6b6f75'];
+  for(let v=0;v<10;v++){const pick=a=>a[(Math.random()*a.length)|0],sk=pick(SKIN),co=COATS[v],pa=pick(PANTS),L=[];
+    const b=(w,h,d,x,y,z,col)=>{const g=new THREE.BoxGeometry(w,h,d);g.translate(x,y,z);L.push(paint(g,col))};
+    for(const sx of [-1,1]){b(.13,.78,.15,sx*.09,.42,0,pa);b(.14,.08,.22,sx*.09,.04,.03,'#1b1b1d');b(.1,.55,.12,sx*.25,1.08,0,co);b(.09,.09,.09,sx*.25,.77,0,sk)}
+    b(.38,.6,.22,0,1.1,0,co);b(.1,.08,.1,0,1.44,0,sk);
+    L.push(paint(new THREE.IcosahedronGeometry(.12,1).translate(0,1.58,0),sk),paint(new THREE.SphereGeometry(.126,10,6,0,Math.PI*2,0,Math.PI*.5).translate(0,1.6,-.01),pick(HAIR)));
+    if(v%3===0)b(.26,.32,.12,0,1.12,-.17,pick(['#3a2a1c','#1b1c1e','#7a1f22']));
+    PED_GEOS.push(mergeGeos(L))}
+  PED_MAT=new THREE.MeshLambertMaterial({vertexColors:true});return PED_GEOS}
+function spawnPeds(n){const G=pedGeos();
+  for(let i=0,k=0;i<n*8&&k<n;i++){const r=ROADS[(Math.random()*ROADS.length)|0],t=(Math.random()*2-1)*(HALF-30),side=Math.random()<.5?-1:1,vert=Math.random()<.5;
+    if(ROADS.some(q=>Math.abs(q-t)<14))continue;let lo=t-45,hi=t+45;for(const r2 of ROADS){if(r2<t)lo=Math.max(lo,r2+11);else hi=Math.min(hi,r2-11)}if(hi-lo<12)continue;
+    const off=r+side*(RW/2+2.1),m=new THREE.Mesh(G[(Math.random()*G.length)|0],PED_MAT);m.castShadow=SHADOWS;const sc=.92+Math.random()*.16;m.scale.setScalar(sc);game.add(m);
+    PEDS.push({m,vert,off,t,lo,hi,dir:Math.random()<.5?1:-1,spd:.9+Math.random()*.6,lat:0,vlat:0,hop:0,vy:0,ph:Math.random()*6,flee:0,a:0});k++}}
+function pedTick(dt){
+  const p=player;
+  for(const d of PEDS){const x0=d.vert?d.off+d.lat:d.t,z0=d.vert?d.t:d.off+d.lat,dpx=x0-p.x,dpz=z0-p.z,far=dpx*dpx+dpz*dpz>170*170;d.m.visible=!far;if(far)continue;
+    // marche (ou fuite) le long du trottoir, demi-tour aux carrefours
+    const sp=d.spd*(d.flee>0?3.2:1);d.flee=Math.max(0,d.flee-dt);d.t+=d.dir*sp*dt;if(d.t>d.hi){d.t=d.hi;d.dir=-1}if(d.t<d.lo){d.t=d.lo;d.dir=1}
+    // esquive : une voiture fonce vers le piéton -> saut de côté, vers l'extérieur du trottoir
+    let threat=null;
+    for(const c of cars){if(c.dead||c.parked)continue;const cv=Math.hypot(c.vx,c.vz);const rx=x0-c.x,rz=z0-c.z;if(rx*rx+rz*rz>(14+cv*.6)**2)continue;
+      const sa=Math.sin(c.a),ca=Math.cos(c.a),al=(rx*sa+rz*ca)*Math.sign(c.vF||1),lt=rx*ca-rz*sa;
+      if((cv>2.5&&al>-1&&al<4+cv*.55&&Math.abs(lt)<c.hw+1.1)||(Math.abs(lt)<c.hw+.6&&Math.abs(rx*sa+rz*ca)<c.hl+.6)){threat=c;break}}
+    for(const g of NET.ghosts.values()){const c=g.car,rx=x0-c.x,rz=z0-c.z;if(rx*rx+rz*rz<36){threat=threat||c}}
+    if(threat&&d.hop===0){const sa=Math.sin(threat.a),ca=Math.cos(threat.a),lt=(x0-threat.x)*ca-(z0-threat.z)*sa,sgn=lt>=0?1:-1;
+      const ex=ca*sgn,ez=-sa*sgn,away=d.vert?ex:ez;d.vlat=(Math.abs(away)>.3?Math.sign(away):(Math.sign(d.off-0)||1))*7;d.vy=3.4;d.hop=1e-3;d.flee=3;
+      if(threat===player){wantedAdd(.25);if(Math.random()<.4)toast(['HÉ !','ATTENTION !','DOUCEMENT !'][(Math.random()*3)|0])}}
+    if(d.hop>0||d.vy!==0){d.vy-=16*dt;d.hop=Math.max(0,d.hop+d.vy*dt);d.lat+=d.vlat*dt;if(d.hop===0&&d.vy<0){d.vy=0;d.vlat=0}}
+    else d.lat*=Math.max(0,1-dt*.6);d.lat=clamp(d.lat,-6.5,6.5);
+    const x=d.vert?d.off+d.lat:d.t,z=d.vert?d.t:d.off+d.lat;d.ph+=dt*sp*5.5;
+    const ta=d.vlat&&d.hop>0?(d.vert?(d.vlat>0?Math.PI/2:-Math.PI/2):(d.vlat>0?0:Math.PI)):(d.vert?(d.dir>0?0:Math.PI):(d.dir>0?Math.PI/2:-Math.PI/2));d.a+=wrapA(ta-d.a)*Math.min(1,dt*8);
+    d.m.position.set(x,d.hop+Math.abs(Math.sin(d.ph))*.05,z);d.m.rotation.set(d.hop>0?-.5:Math.sin(d.ph)*.05,d.a,0)}}
+function pedsScare(x,z,r){for(const d of PEDS){const px=d.vert?d.off+d.lat:d.t,pz=d.vert?d.t:d.off+d.lat;if(Math.hypot(px-x,pz-z)<r){d.flee=6;d.dir=Math.sign((d.vert?pz-z:px-x))||1;if(d.hop===0){d.vy=2.6;d.hop=1e-3}}}}
 const RAMPS=[];let _gH=0,_gS=0,_gA=0;
 function groundAt(x,z){_gH=0;_gS=0;_gA=0;for(const r of RAMPS){const dx=x-r.x,dz=z-r.z;if(dx*dx+dz*dz>r.rr)continue;
   const lx=dx*r.c-dz*r.s,lz=dx*r.s+dz*r.c;if(Math.abs(lx)<r.w/2&&Math.abs(lz)<r.len/2){const h=r.h*(lz+r.len/2)/r.len;if(h>_gH){_gH=h;_gS=r.h/r.len;_gA=r.a}}}return _gH}
@@ -1171,7 +1208,9 @@ function buildWorld(){
   for(let i=0;i<600&&PEOPLE.length<15;i++){const r=R[(Math.random()*R.length)|0],t=(Math.random()*2-1)*(HALF-30),vert=Math.random()<.5;
     if(R.some(q=>Math.abs(q-t)<16))continue;const x=vert?r:t,z=vert?t:r;
     if(Math.hypot(x+54,z+110)<45||RAMPS.some(o=>Math.hypot(o.x-x,o.z-z)<14)||PEOPLE.some(p=>Math.hypot(p.x-x,p.z-z)<60))continue;
-    addPerson(x,z,(vert?0:Math.PI/2)+(Math.random()<.5?Math.PI:0))}
+    const n0=PEOPLE.length;addPerson(x,z,(vert?0:Math.PI/2)+(Math.random()<.5?Math.PI:0));
+    if(PEOPLE.length>n0){const q=PEOPLE[PEOPLE.length-1];let lo=t-35,hi=t+35;for(const r2 of R){if(r2<t)lo=Math.max(lo,r2+16);else hi=Math.min(hi,r2-16)}
+      q.seg={vert,t0:lo,t1:hi,ph:Math.random()*100,spd:1+Math.random()*.4}}}
   // buissons et massifs de fleurs
   for(const b of BUILT_EDGES)BUSH.push(b);
   if(BUSH.length){const bm=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.75,1).translate(0,.45,0),L({color:'#ffffff'}),BUSH.length);
@@ -1433,6 +1472,10 @@ function personContact(c,p,dt){
   const pz=c.hl+Rp-Math.abs(lz),px=c.hw+Rp-Math.abs(lx);let side,pen,lat,maxD,ax,az;
   if(pz/c.hl<=px/c.hw){side=lz>0?'F':'B';pen=pz;lat=lx;maxD=c.sp.L*.5;const g=lz>0?1:-1;ax=sa*g;az=ca*g}
   else{side=lx>0?'L':'R';pen=px;lat=lz;maxD=c.sp.W*.42;const g=lx>0?1:-1;ax=ca*g;az=-sa*g}
+  // la voiture est déjà pliée jusqu'au milieu : le Colosse reste du côté du pliage (pas de traversée)
+  {const opp={F:'B',B:'F',L:'R',R:'L'}[side],w=c.wraps.find(w=>w.side===opp&&w.d>=(opp==='F'||opp==='B'?c.sp.L*.5:c.sp.W*.42)-.05);
+   if(w){side=opp;lat=w.lat;const g=side==='F'||side==='B';maxD=g?c.sp.L*.5:c.sp.W*.42;pen=(g?c.hl:c.hw)+Rp+(g?(side==='F'?-lz:lz):(side==='L'?-lx:lx));
+     const sg=side==='F'||side==='L'?1:-1;ax=g?sa*sg:ca*sg;az=g?ca*sg:-sa*sg}}
   const vin=c.vx*ax+c.vz*az,allowed=wrapAllowed(c,side,lat);
   if(pen>allowed&&vin>1.5&&allowed<maxD-.01)personHit(c,p,side,lat,Math.min(maxD,Math.max(allowed,pen)+vin*.12),vin);
   const lim=wrapAllowed(c,side,lat);
@@ -1513,6 +1556,7 @@ function explode(c){
   for(const w of c.wheels)w.camber=(Math.random()-.5)*.5;
   const fx=c.group.parent===show?fxShow:fxGame,gp=c.group.position;fx.boom(gp.x,.5,gp.z);
   boomSound(c===player||c===showCar?1:clamp(1-(player?Math.hypot(c.x-player.x,c.z-player.z):0)/90,0,.8));
+  pedsScare(c.x,c.z,30);
   if(c===player){shake=1.6;toastT=0;$('#toast').style.opacity=0;addScore(1000,'EXPLOSION',true)}
   if(c===showCar||c.isGhost)return;
   // onde de choc : pousse et abîme les voitures proches (réactions en chaîne possibles)
@@ -1903,7 +1947,7 @@ function startGame(){
   if(!isOpen(selected)){toast(GROUPS[groupOf(selected)].name+' VERROUILLÉS');return}
   $('#loading').hidden=false;
   setTimeout(()=>{
-    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();spawnTraffic()}finally{Math.random=r0}linearize(game)}
+    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();spawnTraffic();spawnPeds(90)}finally{Math.random=r0}linearize(game)}
     if(player&&player.dead)respawnPlayer();
     if(!player||player.sp.base!==selected||player.sp.ckey!==custKey(selected)){
       let x=-54,z=-110,a=0;if(NET.room&&!player)[x,z,a]=respawnSpot(-54,-110);
@@ -1985,9 +2029,14 @@ function frame(now){
   const sub=3,h=dt/sub;for(let i=0;i<sub;i++)physics(h,inp);
   for(const c of cars)c.sync(dt);
   updSparks(dt);fxGame.update(dt);respawnWrecks(dt);updTL(dt);
-  for(const q of PEOPLE){const dx=player.x-q.x,dz=player.z-q.z;if(dx*dx+dz*dz>3600)continue;q.ph+=dt;
+  const wnow=Date.now()/1000;
+  for(const q of PEOPLE){if(q.seg){const S=q.seg,Lg=S.t1-S.t0,u=((wnow*S.spd+S.ph)%(2*Lg)+2*Lg)%(2*Lg),fwd=u<Lg,t=S.t0+(fwd?u:2*Lg-u);
+      if(S.vert)q.z=t;else q.x=t;const ta=S.vert?(fwd?0:Math.PI):(fwd?Math.PI/2:-Math.PI/2);q.a+=wrapA(ta-q.a)*Math.min(1,dt*3);
+      q.grp.position.set(q.x,0,q.z);q.grp.rotation.y=q.a;const sw=Math.sin(wnow*S.spd*5.2+S.ph)*.45;q.legs[0].rotation.x=sw;q.legs[1].rotation.x=-sw;q.body.position.y=Math.abs(Math.cos(wnow*S.spd*5.2+S.ph))*.04}
+    const dx=player.x-q.x,dz=player.z-q.z;if(dx*dx+dz*dz>3600)continue;q.ph+=dt;
     const tgt=clamp(wrapA(Math.atan2(dx,dz)-q.a),-1.1,1.1);q.look=lerp(q.look,tgt,Math.min(1,dt*3));q.head.rotation.y=q.look;
     q.react=Math.max(0,q.react-dt*1.6);const br=1+Math.sin(q.ph*2)*.012;q.body.scale.set(1+q.react*.06,br,1+q.react*.06);q.head.rotation.x=-q.react*.25}
+  pedTick(dt);
   WATER_N.offset.x+=dt*.018;WATER_N.offset.y+=dt*.011;
   for(const c of cars){if(!POND.rx)break;const ix=(c.x-POND.x)/POND.rx,iz=(c.z-POND.z)/POND.rz,inW=ix*ix+iz*iz<.96&&!c.fly&&c.y<.3;
     if(inW){if(c.wet==null){c.wet=0;fxGame.splash(c.x,c.z);crashSound(.25)}c.wet+=dt;const k=Math.max(0,1-dt*2.6);c.vx*=k;c.vz*=k;c.w*=k;c.sink=Math.min(.75,c.wet*.9);
@@ -2018,7 +2067,7 @@ function frame(now){
     if(p.deadT>=RESPAWN_DELAY)respawnPlayer()}
   $('#dmgTxt').style.color=dmg>=75?'var(--accent)':'';
   engineSound(p,inp.gas?1:0,!muted&&!p.dead);fxSounds(p,!muted);
-  if(inp.horn&&!hornWas)for(const q of PEOPLE)if(Math.hypot(q.x-p.x,q.z-p.z)<35)q.react=1;hornWas=inp.horn;
+  if(inp.horn&&!hornWas){for(const q of PEOPLE)if(Math.hypot(q.x-p.x,q.z-p.z)<35)q.react=1;for(const d of PEDS){const px=d.vert?d.off+d.lat:d.t,pz=d.vert?d.t:d.off+d.lat;if(Math.hypot(px-p.x,pz-p.z)<18&&d.hop===0){d.vy=2.4;d.hop=1e-3}}}hornWas=inp.horn;
   $('#n2oBar').style.width=p.nitro+'%';$('#nGauge').style.transform='scaleX('+p.nitro/100+')';$('#bN').classList.toggle('ready',p.nitro>=100);$('#bN').classList.toggle('charging',p.nitro<100&&!p.boostOn);updScore();drawMini(p);
   sky.position.copy(camera.position);
   sun.target.position.set(p.x,0,p.z);sun.position.set(p.x+60,120,p.z+35);
