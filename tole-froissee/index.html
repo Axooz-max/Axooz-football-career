@@ -880,12 +880,11 @@ function buildWorld(){
       cr.setColorAt(i,tc.setHSL(hue+Math.random()*.06,.42+Math.random()*.15,.24+Math.random()*.1).convertSRGBToLinear());addStatic(p[0],p[1],.25,.25,0,'pole')});
     tr.castShadow=cr.castShadow=SHADOWS;game.add(tr,cr)};
   plant(leafy,crownG,.22);plant(conif,coneG,.3);
-  // Colosses sur les trottoirs, dans l'arène et les parcs
-  for(const [x,z,a] of [[18,-8,-1.2],[-14,-26,.4],[6,28,3],[-30,14,1.5],[-100,64,0],[-128,100,1.6],[-200,-200,.5],[200,200,2]])addPerson(x,z,a);
-  for(let i=0,n=0;i<400&&n<34;i++){const r=R[(Math.random()*R.length)|0],t=(Math.random()*2-1)*(HALF-30),side=Math.random()<.5?-1:1,vert=Math.random()<.5;
-    if(R.some(q=>Math.abs(q-t)<15))continue;const off=r+side*(RW/2+2.2),x=vert?off:t,z=vert?t:off;
-    if(RAMPS.some(o=>Math.hypot(o.x-x,o.z-z)<8))continue;const before=PEOPLE.length;
-    addPerson(x,z,vert?(side>0?-Math.PI/2:Math.PI/2):(side>0?Math.PI:0));if(PEOPLE.length>before)n++}
+  // 15 Colosses plantés au milieu des routes, sur la ligne centrale
+  for(let i=0;i<600&&PEOPLE.length<15;i++){const r=R[(Math.random()*R.length)|0],t=(Math.random()*2-1)*(HALF-30),vert=Math.random()<.5;
+    if(R.some(q=>Math.abs(q-t)<16))continue;const x=vert?r:t,z=vert?t:r;
+    if(Math.hypot(x+54,z+110)<45||RAMPS.some(o=>Math.hypot(o.x-x,o.z-z)<14)||PEOPLE.some(p=>Math.hypot(p.x-x,p.z-z)<60))continue;
+    addPerson(x,z,(vert?0:Math.PI/2)+(Math.random()<.5?Math.PI:0))}
   // buissons et massifs de fleurs
   for(const b of BUILT_EDGES)BUSH.push(b);
   if(BUSH.length){const bm=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.75,1).translate(0,.45,0),L({color:'#ffffff'}),BUSH.length);
@@ -1329,7 +1328,7 @@ function respawnSpot(fx,fz){
     const vert=Math.random()<.5,fwd=Math.random()<.5;
     const x=vert?r+(fwd?-4:4):t,z=vert?t:r+(fwd?4:-4),a=vert?(fwd?0:Math.PI):(fwd?Math.PI/2:-Math.PI/2);
     if(Math.hypot(x-fx,z-fz)<120&&tries<50)continue;
-    if(cars.some(c=>Math.hypot(c.x-x,c.z-z)<9)||RAMPS.some(r=>Math.hypot(r.x-x,r.z-z)<16))continue;
+    if(cars.some(c=>Math.hypot(c.x-x,c.z-z)<9)||RAMPS.some(r=>Math.hypot(r.x-x,r.z-z)<16)||PEOPLE.some(p=>Math.hypot(p.x-x,p.z-z)<25))continue;
     return[x,z,a]}
   return[-54,-110,0]}
 function respawnPlayer(){
