@@ -303,10 +303,30 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 #booster.smash .bstamp{animation:bstamp 1.05s cubic-bezier(.2,1.6,.4,1) forwards}
 .bsh i{position:absolute;left:50%;top:45%;width:16px;height:11px;background:var(--c);opacity:0;clip-path:polygon(0 0,100% 30%,60% 100%)}#booster.smash .bsh i{animation:bshard .95s ease-out forwards}
 .bcards{position:absolute;inset:0 0 56px;display:flex;align-items:center;justify-content:center;gap:min(26px,4vw);pointer-events:none}
-.bcard{position:relative;width:min(185px,40vw,46vh);aspect-ratio:3/4.1;border-radius:14px;background:linear-gradient(170deg,#26282d,#121316);border:3px solid var(--rc);box-shadow:0 0 34px var(--rc);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 8px;color:#fff;text-align:center;animation:bflip .75s cubic-bezier(.2,1.3,.4,1) both;isolation:isolate;overflow:hidden}
-.bcard::before{content:'';position:absolute;left:-50%;top:-50%;width:200%;height:200%;z-index:-1;background:conic-gradient(from 0deg,transparent,var(--rc) 10%,transparent 25%,var(--rc) 50%,transparent 65%);opacity:var(--ro,.18);animation:bspin 6s linear infinite}
-.bcard .rr{font-size:10px;letter-spacing:.2em;color:var(--rc);font-weight:800}.bcard svg{width:94%;height:auto}.bcard b{font-size:clamp(12px,2.6vw,15px);line-height:1.15}.bcard small{font-size:10px;color:#b8bbc0;display:block}
-.bcard em{font-style:normal;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;background:#3ecf8e;color:#04150c}.bcard em.dup{background:#f2c40f;color:#1a1200}
+.bcard{position:relative;width:min(178px,40vw,42vh);aspect-ratio:.7;border-radius:14px;padding:4px;background:linear-gradient(145deg,var(--rc),var(--rc2) 45%,var(--rc) 70%,var(--rc2));box-shadow:0 0 28px color-mix(in srgb,var(--rc) 70%,transparent),0 14px 40px rgba(0,0,0,.6);animation:bflip .8s cubic-bezier(.2,1.3,.4,1) both;isolation:isolate;color:#fff}
+.bcard .cf{position:relative;height:100%;border-radius:11px;overflow:hidden;background:radial-gradient(120% 70% at 50% 34%,color-mix(in srgb,var(--rc) 38%,#14161b),#0f1013 70%);display:flex;flex-direction:column}
+.bcard .cf::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.035) 0 6px,transparent 6px 14px);pointer-events:none}
+.bcard .ctop{display:flex;align-items:center;gap:6px;padding:6px 7px 4px;position:relative;z-index:2}
+.bcard .ccls{flex:none;width:24px;height:24px;border-radius:7px;display:grid;place-items:center;font:900 15px/1 var(--display,'Chakra Petch'),Arial;background:var(--rc);color:#111;box-shadow:0 0 10px var(--rc)}
+.bcard .crr{font-size:9px;font-weight:800;letter-spacing:.16em;color:var(--rc);flex:1;text-align:left}.bcard .cst{font-size:9px;color:var(--rc);letter-spacing:1px}
+.bcard .cimg{position:relative;flex:1;min-height:0;margin:0 6px;border-radius:8px;overflow:hidden;background:#14161b;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--rc) 55%,transparent)}
+.bcard .cimg img,.bcard .cimg svg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.bcard .cimg svg{object-fit:contain;padding:12%}
+.bcard .cimg::after{content:'';position:absolute;inset:0;background:radial-gradient(60% 45% at 50% 75%,color-mix(in srgb,var(--rc) 45%,transparent),transparent 70%);mix-blend-mode:screen;pointer-events:none}
+.bcard .cname{padding:5px 8px 2px;text-align:left;position:relative;z-index:2}.bcard .cname small{display:block;font-size:9px;letter-spacing:.14em;color:#aeb2b8;text-transform:uppercase}.bcard .cname b{display:block;font-size:clamp(11px,2.5vw,14px);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard .cbar{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:4px;padding:1px 8px;font-size:8px;color:#aeb2b8;letter-spacing:.06em;position:relative;z-index:2}.bcard .cbar i{height:4px;border-radius:2px;background:#2a2c31;overflow:hidden}.bcard .cbar i b{display:block;height:100%;background:linear-gradient(90deg,var(--rc2),var(--rc));border-radius:2px}
+.bcard .cft{display:flex;justify-content:space-between;align-items:center;padding:4px 8px 7px;font-size:9px;color:#8f939a;position:relative;z-index:2}
+.bcard em{font-style:normal;font-size:9px;font-weight:800;padding:2px 6px;border-radius:5px;background:#3ecf8e;color:#04150c}.bcard em.dup{background:#f2c40f;color:#1a1200}
+.bcard .holo{position:absolute;inset:4px;border-radius:11px;pointer-events:none;z-index:3;background:linear-gradient(115deg,transparent 20%,rgba(255,0,128,.35) 32%,rgba(255,220,0,.35) 40%,rgba(0,255,200,.35) 48%,rgba(80,120,255,.35) 56%,transparent 68%);background-size:300% 100%;mix-blend-mode:color-dodge;opacity:0;animation:bholo 3s linear infinite}
+.bcard.r2 .holo{opacity:.45}.bcard.r3 .holo{opacity:.65}.bcard.r4 .holo{opacity:.85}
+.bcard .spk{position:absolute;width:6px;height:6px;z-index:4;pointer-events:none;background:#fff;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:btw 1.4s ease-in-out infinite;opacity:0}
+.bcard .frm{position:absolute;inset:0;border-radius:14px;z-index:-1;background:inherit}.bcard.r4 .frm{animation:bmyth 2.4s linear infinite}.bcard.r4 .rays{animation:bspin 9s linear infinite,bmyth 2.4s linear infinite}
+.bcard .rays{position:absolute;left:50%;top:40%;width:260%;aspect-ratio:1;transform:translate(-50%,-50%);z-index:-1;background:repeating-conic-gradient(color-mix(in srgb,var(--rc) 60%,transparent) 0 8deg,transparent 8deg 22deg);opacity:0;border-radius:50%;animation:bspin 9s linear infinite;-webkit-mask:radial-gradient(closest-side,#000 30%,transparent);mask:radial-gradient(closest-side,#000 30%,transparent)}
+.bcard.r2 .rays{opacity:.35}.bcard.r3 .rays{opacity:.6}.bcard.r4 .rays{opacity:.8}
+@keyframes bholo{0%{background-position:120% 0}100%{background-position:-120% 0}}@keyframes btw{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.2) rotate(45deg)}}
+@keyframes bmyth{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.card{position:relative}.card[data-r]{background:linear-gradient(90deg,color-mix(in srgb,var(--rc) 16%,var(--panel2)),var(--panel2) 55%);box-shadow:inset 3px 0 0 var(--rc)}.card[data-r] .rtag{position:absolute;top:5px;right:6px;font:800 9px/1 var(--display,'Chakra Petch'),Arial;color:#111;background:var(--rc);border-radius:4px;padding:2px 4px}
+.card[data-r="4"]{box-shadow:inset 3px 0 0 var(--rc),0 0 0 1px color-mix(in srgb,var(--rc) 50%,transparent)}
+#mSpecs .rcls{color:#111;font-weight:800;border:0}
 .bbtns{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:0;right:0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 12px;animation:fadein .5s 1.3s both}
 .bbtns button{background:#2a2c30;border:1px solid #3a3d42;color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;letter-spacing:.08em;font-size:12px}.bbtns button.main{background:var(--accent);border-color:var(--accent);color:#160800}
 .btap{position:absolute;bottom:12%;width:100%;text-align:center;color:#ddd;letter-spacing:.3em;font-size:11px;animation:bpulse 1s infinite}#booster.smash .btap{display:none}
@@ -2963,7 +2983,7 @@ function buildMenu(){
    const btn=document.createElement('button');btn.textContent=label;btn.dataset.b='__'+k;btn.onclick=()=>{const sec=document.getElementById('b-'+k);list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
    const sec=document.createElement('section');sec.id='b-'+k;sec.innerHTML=`<h3><span>${g.name}</span><span id="state-${k}"></span></h3><p class="tnote">${g.note}</p>`;
    const grid=document.createElement('div');grid.className='cards';
-   for(const c of list2){const el=document.createElement('button');el.className='card lock';el.dataset.id=c.id;el.dataset.g=k;
+   for(const c of list2){const el=document.createElement('button');el.className='card lock';el.dataset.id=c.id;rarCard(el,c);el.dataset.g=k;
      el.innerHTML=`<span class="sw" style="background:${c.color}"></span><div><b>${c.brand==='Monster Trucks'?c.name:c.brand+' '+c.name}</b><small>${c.year} · ${c.hp} ch · ${(c.kg/1000).toFixed(1).replace('.',',')} t</small></div><em class="padlock" aria-hidden="true"></em>`;
      el.onclick=()=>selectCar(c);grid.appendChild(el)}
    sec.appendChild(grid);list.appendChild(sec)}
@@ -2972,7 +2992,7 @@ function buildMenu(){
     const sec=document.createElement('section');sec.id='b-'+slug(b);const cs=CARS.filter(c=>c.brand===b&&!groupOf(c)).sort((x,y)=>x.year-y.year);
     sec.innerHTML=`<h3><span>${b}</span><span>${cs.length}</span></h3>`;const grid=document.createElement('div');grid.className='cards';
     for(const c of cs){const el=document.createElement('button');el.className='card';el.dataset.id=c.id;
-      el.innerHTML=`<span class="sw" style="background:${(customs[c.id]||{}).color||c.color}"></span><div><b>${c.name}${mastStars(c.id)}</b><small>${c.year} · ${c.hp} ch</small></div>`;
+      el.innerHTML=`<span class="sw" style="background:${(customs[c.id]||{}).color||c.color}"></span><div><b>${c.name}${mastStars(c.id)}</b><small>${c.year} · ${c.hp} ch</small></div>`;rarCard(el,c);
       el.onclick=()=>selectCar(c);grid.appendChild(el)}
     sec.appendChild(grid);list.appendChild(sec)}
   list.addEventListener('scroll',()=>{let cur=BRANDS[0];for(const b of BRANDS){const s=document.getElementById('b-'+slug(b));if(s.offsetTop-list.offsetTop-list.scrollTop<40)cur=b}
@@ -2984,7 +3004,8 @@ function selectCar(c){
   document.querySelectorAll('.card').forEach(e=>e.classList.toggle('on',e.dataset.id===c.id));
   $('#mBrand').textContent=c.brand;$('#mName').textContent=c.name;
   $('#mSpecs').innerHTML=[c.year,c.hp+' ch',c.kg+' kg',c.vmax+' km/h',(c.L).toFixed(2).replace('.',',')+' m'].map(s=>`<span>${s}</span>`).join('')+(+(store.get('tf_bestc_'+c.id)||0)?`<span class="rec">🏆 ${(+store.get('tf_bestc_'+c.id)).toLocaleString('fr-FR')}</span>`:'');
-  rebuildShow();renderCustom();updUnlockUI();
+  {const R=RAR[carRar(c)];$('#mSpecs').insertAdjacentHTML('afterbegin',`<span class="rcls" style="background:${R[1]}">${R[3]} · ${R[0]}</span>`)}
+  rebuildShow();rarGlow(c);renderCustom();updUnlockUI();
 }
 // vue éclatée dans l'atelier : la voiture se démonte (carrosserie, roues, moteur, nitro)
 const EXP={e:0,target:0,hl:null,hlT:0,spin:0,jump:0,eng:null};
@@ -4189,16 +4210,17 @@ smashrLogo.n=0;
 const carSVG=col=>`<svg viewBox="0 0 120 50"><ellipse cx="61" cy="45" rx="54" ry="3.5" fill="#000" opacity=".45"/><path d="M8 36 L10 26 Q12 22 20 21 L38 19 L52 9 Q56 7 64 7 L84 8 Q90 9 95 16 L104 20 Q112 22 113 28 L114 36 Z" fill="${col}" stroke="#000" stroke-opacity=".45" stroke-width="1.5"/><path d="M42 19 L54 11 Q57 10 63 10 L72 10 L73 19 Z M76 10 L84 10.5 Q88 11 91 16 L92 19 L77 19 Z" fill="#9fc7e8" opacity=".85"/><circle cx="30" cy="37" r="8" fill="#151618"/><circle cx="30" cy="37" r="4" fill="#c9ccd1"/><circle cx="92" cy="37" r="8" fill="#151618"/><circle cx="92" cy="37" r="4" fill="#c9ccd1"/></svg>`;
 
 /* ---------- boosters : 2 voitures au hasard ---------- */
-const BST_T=[{n:'PETIT BOOSTER',min:0,max:120,pr:5000,c1:'#2bb3ff',c2:'#0b3d91'},{n:'BOOSTER SPORT',min:121,max:250,pr:10000,c1:'#ff5b1f',c2:'#7a1a05'},{n:'BOOSTER BOLIDE',min:251,max:99999,pr:20000,c1:'#e2b53e',c2:'#3a2605'}];
-const RAR=[['COMMUNE','#9aa0a8',10],['RARE','#2bb3ff',6],['ÉPIQUE','#b46cff',3],['LÉGENDAIRE','#f2c40f',1]];
+const BST_T=[{n:'PETIT BOOSTER',up:.1,min:0,max:120,pr:5000,c1:'#2bb3ff',c2:'#0b3d91'},{n:'BOOSTER SPORT',up:.1,min:121,max:250,pr:10000,c1:'#ff5b1f',c2:'#7a1a05'},{n:'BOOSTER BOLIDE',up:0,min:251,max:99999,pr:20000,c1:'#e2b53e',c2:'#3a2605'}];
+const RAR=[['COMMUNE','#9aa0a8',10,'C','#4d5157'],['RARE','#2bb3ff',6,'B','#0b4f8a'],['ÉPIQUE','#b46cff',3,'A','#4b1f8a'],['LÉGENDAIRE','#f2c40f',1,'S','#8a5a05'],['MYTHIQUE','#ff2b5e',.5,'X','#7a0a2a']];
+function carRar(c){if(c.race||c.hp>800)return 4;return c.hp>450?3:c.hp>250?2:c.hp>120?1:0}
 const BST={free:+(store.get('tf_bfree')||0),last:-1};
 function bstPool(t){return CARS.filter(c=>!groupOf(c)&&!c.race&&c.id!==STARTER&&c.hp>=t.min&&c.hp<=t.max)}
-function bstRar(c,pool){const n=pool.filter(x=>x.hp<c.hp).length/pool.length;return n>=.9?3:n>=.68?2:n>=.38?1:0}
-function bstPick(t){const pool=bstPool(t),out=[];for(let k=0;k<2;k++){let cand=pool.filter(c=>!owned(c)&&!out.includes(c));if(!cand.length)cand=pool.filter(c=>!out.includes(c));if(!cand.length)cand=pool;
-    const ws=cand.map(c=>RAR[bstRar(c,pool)][2]);let r=Math.random()*ws.reduce((a,b)=>a+b,0),i=0;while(i<ws.length-1&&r>ws[i]){r-=ws[i];i++}out.push(cand[i])}
-  return out.map(c=>({c,rar:bstRar(c,pool),dup:owned(c)}))}
+function bstRar(c){return carRar(c)}
+function bstPick(t){const out=[];for(let k=0;k<2;k++){const ti=BST_T.indexOf(t),lucky=t.up&&Math.random()<t.up,pool=bstPool(lucky?BST_T[ti+1]:t);let cand=pool.filter(c=>!owned(c)&&!out.includes(c));if(!cand.length)cand=pool.filter(c=>!out.includes(c));if(!cand.length)cand=pool;
+    const ws=cand.map(c=>RAR[carRar(c)][2]);let r=Math.random()*ws.reduce((a,b)=>a+b,0),i=0;while(i<ws.length-1&&r>ws[i]){r-=ws[i];i++}out.push(cand[i])}
+  return out.map(c=>({c,rar:carRar(c),dup:owned(c)}))}
 function bstRange(t){return t.max>9999?'plus de '+(t.min-1)+' ch':(t.min||bstPool(t).reduce((m,c)=>Math.min(m,c.hp),999))+' à '+t.max+' ch'}
-function bstShopHTML(){return BST_T.map((t,i)=>{const free=i===0&&BST.free>0;return `<button class="bpk" data-bst="${i}" style="--c1:${t.c1};--c2:${t.c2}">${smashrLogo()}<b>${t.n}</b><small>2 voitures · ${bstRange(t)}</small><em class="${free?'free':''}">${free?'GRATUIT ×'+BST.free:t.pr.toLocaleString('fr-FR')+' €'}</em></button>`}).join('')}
+function bstShopHTML(){return BST_T.map((t,i)=>{const free=i===0&&BST.free>0;return `<button class="bpk" data-bst="${i}" style="--c1:${t.c1};--c2:${t.c2}">${smashrLogo()}<b>${t.n}</b><small>2 voitures · ${bstRange(t)}</small><small>${t.up?`classe ${RAR[i][3]} · chance de ${RAR[i+1][3]}`:'classes A · S · X'}</small><em class="${free?'free':''}">${free?'GRATUIT ×'+BST.free:t.pr.toLocaleString('fr-FR')+' €'}</em></button>`}).join('')}
 function bstSection(bar,list){const btn=document.createElement('button');btn.textContent='🎁 Boosters';btn.dataset.b='__boost';btn.onclick=()=>list.scrollTo({top:0,behavior:'smooth'});bar.appendChild(btn);
   const sec=document.createElement('section');sec.id='b-boost';sec.innerHTML=`<h3><span>BOOSTERS SMASHR</span><span>2 voitures au hasard</span></h3><div class="bshop">${bstShopHTML()}</div><p class="tnote">Nouvelles voitures en priorité · doublon remboursé à 50 % · un petit booster offert tous les 5 niveaux</p>`;
   sec.addEventListener('click',e=>{const b=e.target.closest('[data-bst]');if(b)bstBuy(+b.dataset.bst)});list.appendChild(sec)}
@@ -4207,18 +4229,39 @@ function bstLevel(l){if(l%5)return;BST.free++;store.set('tf_bfree',BST.free);set
 function bstBuy(i){const t=BST_T[i],free=i===0&&BST.free>0;if(!free&&BANK.cash<t.pr){toast('IL TE MANQUE '+(t.pr-BANK.cash).toLocaleString('fr-FR')+' €');return}
   if(free){BST.free--;store.set('tf_bfree',BST.free)}else{BANK.cash-=t.pr;store.set('tf_cash',BANK.cash)}
   const res=bstPick(t);for(const r of res){if(r.dup){r.ref=Math.round(carPrice(r.c)*.5/100)*100;earn(r.ref)}else OWNED[r.c.id]=1}store.set('tf_owned',JSON.stringify(OWNED));STATS.boosters=(STATS.boosters|0)+1;statSave();BST.last=i;renderBst();bstAnim(t,res)}
-function bstAnim(t,res){const el=$('#booster'),inner=`${smashrLogo()}<b>${t.n}</b><small>2 VOITURES · ${bstRange(t).toUpperCase()}</small>`;
+function bstAnim(t,res){const el=$('#booster'),inner=`${smashrLogo()}<b>${t.n}</b><small>2 VOITURES · ${bstRange(t).toUpperCase()}</small><small>${t.up?'CLASSE '+RAR[BST_T.indexOf(t)][3]+' · CHANCE DE '+RAR[BST_T.indexOf(t)+1][3]:'CLASSES A · S · X'}</small>`;
   let sh='';for(let k=0;k<22;k++){const a=Math.random()*6.283,d=120+Math.random()*260;sh+=`<i style="--c:${k%3?t.c1:'#fff'};--dx:${Math.cos(a)*d|0}px;--dy:${Math.sin(a)*d|0}px;--r:${(Math.random()*720-360)|0}deg"></i>`}
   el.className='';el.innerHTML=`<div class="bpack"><div class="bh l" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div><div class="bh r" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div></div><div class="bfl"></div><div class="bsh">${sh}</div><div class="bstamp">SMASH !</div><div class="bcards"></div><div class="btap">TOUCHE POUR ÉCRASER</div>`;el.hidden=false;
   try{if(AC)sfxN(AC.currentTime,.45,'bandpass',500,1,.25,2600)}catch(e){}
   let opened=false;const tm=[];const open=()=>{if(opened)return;opened=true;tm.forEach(clearTimeout);el.classList.remove('shake');void el.offsetWidth;el.classList.add('smash');vib(140);
     try{if(AC){crashSound(1);sfxN(AC.currentTime,.7,'lowpass',260,1,.55)}}catch(e){}
-    setTimeout(()=>{const box=el.querySelector('.bcards');box.innerHTML=res.map((r,k)=>{const R=RAR[r.rar];return `<div class="bcard" style="--rc:${R[1]};--ro:${.12+r.rar*.12};animation-delay:${k*.38}s"><span class="rr">${R[0]}</span>${carSVG((customs[r.c.id]||{}).color||r.c.color||'#c41b1b')}<div><b>${escH(r.c.brand)}<br>${escH(r.c.name)}</b><small>${r.c.year} · ${r.c.hp} ch · ${r.c.vmax} km/h</small></div>${r.dup?`<em class="dup">DOUBLON · +${r.ref.toLocaleString('fr-FR')} €</em>`:'<em>NOUVELLE !</em>'}</div>`}).join('');
-      res.forEach((r,k)=>setTimeout(()=>{try{if(AC){const t0=AC.currentTime;sfxO(t0,.22,'triangle',520+r.rar*180,.13);sfxO(t0+.09,.3,'triangle',780+r.rar*240,.11)}}catch(e){}if(r.rar>=2)vib(60)},k*380+250));
+    const thumbs=res.map(r=>carThumb(r.c));
+    setTimeout(()=>{const box=el.querySelector('.bcards');box.innerHTML=res.map((r,k)=>cardHTML(r,k,thumbs[k])).join('');
+      res.forEach((r,k)=>setTimeout(()=>{try{if(AC){const t0=AC.currentTime;sfxO(t0,.22,'triangle',520+r.rar*160,.13);sfxO(t0+.09,.3,'triangle',780+r.rar*200,.11);if(r.rar>=3){sfxO(t0+.2,.5,'sine',1320,.09);sfxO(t0+.32,.6,'sine',1760,.07)}}}catch(e){}if(r.rar>=2)vib(60+r.rar*30)},k*420+250));
       const nw=res.find(r=>!r.dup)||res[0],again=BST_T[BST.last];
       el.insertAdjacentHTML('beforeend',`<div class="bbtns"><button class="main" data-bx="see">VOIR LA ${escH(nw.c.name.toUpperCase().slice(0,18))}</button><button data-bx="again">ENCORE · ${(BST.last===0&&BST.free>0)?'GRATUIT':again.pr.toLocaleString('fr-FR')+' €'}</button><button data-bx="close">FERMER</button></div>`);
       el.onclick=e=>{const b=e.target.closest('[data-bx]');if(!b)return;const k=b.dataset.bx;el.hidden=true;el.innerHTML='';if(k==='see'){selectCar(nw.c);const cd=document.querySelector('.card[data-id="'+nw.c.id+'"]');if(cd)cd.scrollIntoView({block:'center',behavior:'smooth'})}else{selectCar(selected);if(k==='again')bstBuy(BST.last)}}},650)};
   el.onclick=()=>open();tm.push(setTimeout(()=>el.classList.add('shake'),700),setTimeout(open,2800))}
+
+
+/* ---------- classes / raretés : cartes, fiches du garage, halo sous la voiture ---------- */
+function rarCard(el,c){const k=carRar(c),R=RAR[k];el.dataset.r=k;el.style.setProperty('--rc',R[1]);el.insertAdjacentHTML('beforeend',`<i class="rtag">${R[3]}</i>`)}
+let _rgTex=null;
+function rarGlow(c){if(!showCar)return;if(!_rgTex){const cv=document.createElement('canvas');cv.width=cv.height=128;const g=cv.getContext('2d'),gr=g.createRadialGradient(64,64,20,64,64,64);gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.55,'rgba(255,255,255,.55)');gr.addColorStop(.75,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,128,128);_rgTex=new THREE.CanvasTexture(cv)}
+  const k=carRar(c),m=new THREE.MeshBasicMaterial({map:_rgTex,color:RAR[k][1],transparent:true,opacity:.55+k*.1,blending:THREE.AdditiveBlending,depthWrite:false});m.userData.lin=1;
+  const sp=showCar.sp,pl=new THREE.Mesh(new THREE.PlaneGeometry(sp.W*2.3,sp.L*1.5),m);pl.rotation.x=-Math.PI/2;pl.position.y=.025;pl.renderOrder=2;showCar.group.add(pl);showCar.rarM=pl}
+function rarGlowTick(){const g=showCar&&showCar.rarM;if(!g)return;const k=carRar(selected),t=performance.now()/1000;g.material.opacity=(.5+k*.1)*(.85+.15*Math.sin(t*(1.5+k*.6)));if(k===4)g.material.color.setHSL((t*.15)%1,.9,.6)}
+// image 3D de la voiture pour les cartes : rendue avec l'éclairage du garage
+function carThumb(c){if(!showCar||state!=='menu')return null;let tmp=null;const hid=[showCar.group,...NEIGH.l.map(n=>n.group),typeof SHOW_MIR!=='undefined'&&SHOW_MIR&&SHOW_MIR.g].filter(g=>g&&g.visible);
+  try{tmp=new Car(specFor(c));tmp.crisp.mesh.material=showMat(tmp.sp.fin);tmp.setPose(0,0,0);show.add(tmp.group);hid.forEach(g=>g.visible=false);
+    const W=canvas.width,H=canvas.height,cam=new THREE.PerspectiveCamera(26,W/H,.1,200),sp=tmp.sp,d=sp.L*2.05+1.2,a=.72;cam.position.set(Math.sin(a)*d,sp.H*.75+.9,Math.cos(a)*d);cam.lookAt(0,sp.H*.42,0);
+    renderer.render(show,cam);const out=document.createElement('canvas');out.width=360;out.height=300;const ch=H,cw=ch*1.2;out.getContext('2d').drawImage(canvas,(W-cw)/2,0,cw,ch,0,0,360,300);return out.toDataURL('image/jpeg',.88)}
+  catch(e){return null}finally{if(tmp){show.remove(tmp.group);tmp.group.traverse(o=>{if(o.geometry)o.geometry.dispose()})}hid.forEach(g=>g.visible=true)}}
+function cardHTML(r,k,img){const R=RAR[r.rar],c=r.c,bar=(l,v)=>`<div class="cbar"><span>${l}</span><i><b style="width:${Math.round(clamp(v,.04,1)*100)}%"></b></i></div>`;
+  let spk='';if(r.rar>=3)for(let i=0;i<7;i++)spk+=`<i class="spk" style="left:${8+Math.random()*84}%;top:${6+Math.random()*80}%;animation-delay:${(Math.random()*1.4).toFixed(2)}s"></i>`;
+  return `<div class="bcard r${r.rar}" style="--rc:${R[1]};--rc2:${R[4]};animation-delay:${k*.42}s"><i class="rays"></i><i class="frm"></i><div class="cf"><div class="ctop"><span class="ccls">${R[3]}</span><span class="crr">${R[0]}</span><span class="cst">${'★'.repeat(r.rar+1)}</span></div>
+    <div class="cimg">${img?`<img src="${img}" alt="">`:carSVG((customs[c.id]||{}).color||c.color||'#c41b1b')}</div><div class="cname"><small>${escH(c.brand)}</small><b>${escH(c.name)}</b></div>
+    ${bar('PUISS.',c.hp/1000)}${bar('VITESSE',(c.vmax-60)/300)}${bar('ACCÉL.',(c.hp/c.kg)/.55)}<div class="cft"><span>${r.dup?c.year:c.year+' · '+c.hp+' ch'}</span>${r.dup?`<em class="dup">DOUBLON +${r.ref>=1000?Math.round(r.ref/1000)+' k':r.ref}€</em>`:'<em>NOUVELLE !</em>'}</div></div><i class="holo"></i>${spk}</div>`}
 
 let toastT=0;function toast(t){const e=$('#toast');e.textContent=t;e.classList.toggle('long',t.length>22);e.style.opacity=1;toastT=t.length>22?2.8:1.1}
 
@@ -4309,7 +4352,7 @@ function frame(now){
       const hf=2*Math.atan(Math.tan(showCam.fov*Math.PI/360)*(land?Math.max(1,showCam.aspect*.58):showCam.aspect));
       const d=Math.max(sp.L*.6/Math.tan(hf/2),sp.H*1.1/Math.tan(showCam.fov*Math.PI/360*(land?1:.55)))+sp.L*.35;
       const wz=smooth01(WORK.z),zf=1-.3*wz,lw=WORK.lookW;showCam.position.set(d*.62*zf,(sp.H*1.15+.9)*(1-.1*wz),d*.78*zf);showCam.lookAt(lw.x*wz,sp.H*.42-.12*wz+showCar.group.position.y*.75,lw.z*wz)}
-    if(showCar){introTick(dt);slideTick();showCar.sync(dt);explodeTick(dt);workTick(dt);mirrorTick()}fxShow.update(dt);updShowDmg();netTick(dt);unlockTick(dt);
+    if(showCar){introTick(dt);slideTick();rarGlowTick();showCar.sync(dt);explodeTick(dt);workTick(dt);mirrorTick()}fxShow.update(dt);updShowDmg();netTick(dt);unlockTick(dt);
     renderer.render(show,showCam);return;
   }
   if(PHOTOM.on){photoFrame();return}
