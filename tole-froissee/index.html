@@ -981,8 +981,7 @@ class Car{
     deformArr(this.det.P,this.det.O,lx,ly,lz,dx,dy,dz,str,rad,belt);this.det.geo.attributes.position.needsUpdate=true;this.det.geo.computeVertexNormals();
     for(const g of this.glows.concat(this.plates)){deformArr(g.P,g.O,lx,ly,lz,dx,dy,dz,str,rad,belt);g.geo.attributes.position.needsUpdate=true}
     if(this===player&&NET.room)netRecord('dents',[lx,ly,lz,dx,dy,dz,str,rad]);
-    for(const w of this.wheels){const d=Math.hypot(w.x-lx,w.z-lz);if(d<rad*1.1)w.camber=clamp(w.camber+w.sg*str*.6*(1-d/(rad*1.1)),-.3,.3);
-      if(!w.off&&!this.isGhost&&this!==showCar&&d<rad*.85&&(Math.abs(w.camber)>=.27||(str>.3&&Math.random()<.35)))wheelOff(this,w)}
+    for(const w of this.wheels){const d=Math.hypot(w.x-lx,w.z-lz);if(d<rad*1.1)w.camber=clamp(w.camber+w.sg*str*.6*(1-d/(rad*1.1)),-.3,.3);}
   }
   repair(){if(this===player)netReset();this.zone={};this.lost={};this.crisp.reset();this.det.P.set(this.det.O);this.det.geo.attributes.position.needsUpdate=true;this.det.geo.computeVertexNormals();
     this.det.geo.attributes.color.array.set(this.det.C0);this.det.geo.attributes.color.needsUpdate=true;
