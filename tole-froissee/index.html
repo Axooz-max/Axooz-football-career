@@ -1573,7 +1573,7 @@ const others=[...NET.ghosts.values()].map(g=>g.car);
     const busy=cars.some(c=>Math.hypot(c.x-s.x,c.z-s.z)<9);return{s,i,d:(busy?-1e6:0)+d+Math.random()*40}}).sort((a,b)=>b.d-a.d);
   const S=sc[0].s;return[S.x,S.z,S.a,S.name]}
 /* ---------- PIÉTONS : marchent sur les trottoirs, sautent sur le côté quand une voiture arrive ---------- */
-const PEDS=[];let PED_GEOS=null,PED_MAT=null;
+const PEDS=[];let PED_GEOS=null,PED_MAT=null,PED_FAR=170*170;
 function pedGeos(){if(PED_GEOS)return PED_GEOS;PED_GEOS=[];const COATS=['#2c3e66','#8a1f1f','#2f5d3a','#d9d6cf','#c8781d','#5b2a7a','#3a6f8f','#d94f8c','#e2b21c','#6b6f75'];
   for(let v=0;v<10;v++){const pick=a=>a[(Math.random()*a.length)|0],sk=pick(SKIN),co=COATS[v],pa=pick(PANTS),L=[];
     const b=(w,h,d,x,y,z,col)=>{const g=new THREE.BoxGeometry(w,h,d);g.translate(x,y,z);L.push(paint(g,col))};
@@ -1601,7 +1601,7 @@ function pedLaunch(d,vx,vz,sp){d.st='fly';d.vx=vx*1.05;d.vz=vz*1.05;d.vy=3.5+sp*
 function pedTick(dt){
   const p=player;
   for(const d of PEDS){if(d.x==null){[d.x,d.z]=pedBase(d);d.y=0;d.st='walk'}
-    const far=(d.x-p.x)**2+(d.z-p.z)**2>170*170;d.m.visible=!far;if(far&&d.st==='walk')continue;
+    const far=(d.x-p.x)**2+(d.z-p.z)**2>PED_FAR;d.m.visible=!far;if(far&&d.st==='walk')continue;
     if(d.st==='walk'){if(d.cross)crossTick(d,dt);else{d.t+=d.dir*d.spd*dt;if(d.t>d.hi){d.t=d.hi;d.dir=-1}if(d.t<d.lo){d.t=d.lo;d.dir=1}}
       const [bx,bz]=pedBase(d),ex=bx-d.x,ez=bz-d.z,el=Math.hypot(ex,ez);
       if(el>.05){const k=Math.min(1,d.spd*1.2*dt/el);d.x+=ex*k;d.z+=ez*k}
@@ -3435,7 +3435,7 @@ function leafTick(dt,cam){if(MAP!=='city'||(SEASON!=='automne'&&SEASON!=='printe
   LEAF.pts.geometry.attributes.position.needsUpdate=true}
 /* ---------- FLUIDITÉ : moins de détails sur les voitures lointaines ---------- */
 const LOD={t:0};
-function lodTick(dt){LOD.t-=dt;if(LOD.t>0||!player)return;LOD.t=.3;const near=QUAL===0?110:QUAL===1?170:240,hide=game.fog.far*.92,cx=camera.position.x,cz=camera.position.z;
+function lodTick(dt){LOD.t-=dt;if(LOD.t>0||!player)return;PED_FAR=[85,130,170][QUAL]**2;LOD.t=.3;const near=QUAL===0?110:QUAL===1?170:240,hide=game.fog.far*.92,cx=camera.position.x,cz=camera.position.z;
   for(const c of cars){if(c===player)continue;const d=Math.hypot(c.x-cx,c.z-cz),lv=d>hide?2:d>near?1:0;if(c.lod===lv)continue;c.lod=lv;c.group.visible=lv<2;const det=lv===0;
     c.detMesh.visible=det;c.crisp.glassMesh.visible=det;for(const q of c.plates)q.m.visible=det&&(q!==c.crack||q.m.material.opacity>0);for(const g of c.glows)g.m.visible=det;if(c.cone)c.cone.visible=det&&c.cone.visible;for(const w of c.wheels)if(w.pv.children[1])w.pv.children[1].visible=det}}
 /* ---------- BRUITS DE CARROSSERIE ---------- */
@@ -3678,7 +3678,7 @@ function startGame(){if(WORK.on)workClear();
   if(!isOpen(selected)){toast(GROUPS[groupOf(selected)].name+' VERROUILLÉS');return}
   $('#loading').hidden=false;
   setTimeout(()=>{
-    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();if(MAP==='city'){spawnTraffic();spawnPeds(QUAL===0?40:90);spawnCrossers(QUAL===0?10:24)}buildPickups();buildStations()}finally{Math.random=r0}linearize(game)}
+    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();if(MAP==='city'){spawnTraffic();spawnPeds(200);spawnCrossers(QUAL===0?10:24)}buildPickups();buildStations()}finally{Math.random=r0}linearize(game)}
     if(player&&player.dead)respawnPlayer();
     if(!player||player.sp.base!==selected||player.sp.ckey!==custKey(selected)){
       let [x,z,a,nm]=pickSpawn();setTimeout(()=>toast('DÉPART '+nm),400);
