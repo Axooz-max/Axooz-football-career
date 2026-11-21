@@ -288,7 +288,41 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 #mHam.on{background:#e8a21f;color:#160800}.pl .lk.on{background:#c41b1b;border-color:#c41b1b}.pl .lkme{margin-left:auto;color:#ff6b8a;font-size:12px;font-weight:700}
 #lostCard{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 120px);transform:translateX(-50%);z-index:31;background:rgba(10,11,14,.88);border:2px solid #e33;border-radius:12px;padding:10px 18px;display:flex;flex-direction:column;align-items:center;gap:3px;pointer-events:none;zoom:var(--uk,1)}#lostCard[hidden]{display:none}#lostCard b{color:#ff6b5b;letter-spacing:.15em;font-size:15px}#lostCard span{color:#fff;font-size:18px;font-weight:800}#lostCard em{font-style:normal;color:var(--accent2);font-size:13px;font-weight:700}#lostCard.go{animation:lostIn .45s cubic-bezier(.2,1.5,.4,1)}@keyframes lostIn{from{transform:translateX(-50%) scale(.6);opacity:0}}
 #mSpecs .rec{color:var(--accent2);border-color:var(--accent)}
-.card .mst{color:#f2c40f;font-size:10px;letter-spacing:1px;margin-left:4px}#rewfx{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;z-index:6;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 2px,transparent 2px 6px),linear-gradient(90deg,rgba(80,160,255,.18),rgba(255,60,160,.18))}#hRew{font-size:12px}#multi .pl em{font-style:normal;font-size:11px;color:#f2c40f}.sesg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}.sesg div{background:#202226;border-radius:8px;padding:8px}.sesg small{display:block;color:#9a9da3;font-size:10px}.sesg b{font-size:18px}#moments{position:fixed;inset:0;z-index:67;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:12px}#moments[hidden],#phoBar[hidden]{display:none}#moments .gbox{width:min(520px,94vw);max-height:88vh;overflow-y:auto;background:#15161a;border:1px solid var(--line);border-radius:14px;padding:14px 18px;zoom:var(--uk,1)}#moments h3{margin:0 0 8px;color:var(--accent2);letter-spacing:.15em}#moments .pbtn{display:block;margin:12px auto 0}
+.card .mst{color:#f2c40f;font-size:10px;letter-spacing:1px;margin-left:4px}
+#booster{position:fixed;inset:0;z-index:95;background:radial-gradient(circle at 50% 45%,rgba(48,22,8,.94),rgba(0,0,0,.97));display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;user-select:none}
+#booster[hidden]{display:none}#booster.smash{animation:bquake .45s}
+.bpack{position:relative;width:min(200px,40vw,48vh);aspect-ratio:2/3;animation:bdrop .65s cubic-bezier(.3,1.5,.5,1) both}
+#booster.shake .bpack{animation:bshake .11s linear infinite}#booster.smash .bpack{animation:none}
+.bh{position:absolute;inset:0;border-radius:14px;background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 0 0 3px rgba(255,255,255,.18) inset,0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;text-align:center;transition:transform .75s cubic-bezier(.2,.8,.3,1),opacity .75s;overflow:hidden}
+.bh.l{clip-path:polygon(0 0,53% 0,47% 16%,56% 33%,45% 50%,55% 67%,46% 84%,52% 100%,0 100%)}.bh.r{clip-path:polygon(53% 0,100% 0,100% 100%,52% 100%,46% 84%,55% 67%,45% 50%,56% 33%,47% 16%)}
+.bh svg{width:92%;height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}.bh b{font-size:clamp(10px,2.4vw,13px);letter-spacing:.12em}.bh small{font-size:10px;opacity:.85;letter-spacing:.08em}
+.bh::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.35) 45%,transparent 60%);background-size:250% 100%;animation:bshine 2.2s linear infinite}
+#booster.smash .bh.l{transform:translate(-60vw,22vh) rotate(-42deg);opacity:0}#booster.smash .bh.r{transform:translate(60vw,28vh) rotate(48deg);opacity:0}
+.bfl{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}#booster.smash .bfl{animation:bflash .55s ease-out}
+.bstamp{position:absolute;top:42%;left:50%;font:900 clamp(40px,11vw,96px)/1 var(--display,'Chakra Petch'),Arial;color:#ff5b1f;text-shadow:0 5px 0 #160800,0 0 30px rgba(255,91,31,.8);transform:translate(-50%,-50%) scale(0);opacity:0;pointer-events:none;letter-spacing:.04em;white-space:nowrap}
+#booster.smash .bstamp{animation:bstamp 1.05s cubic-bezier(.2,1.6,.4,1) forwards}
+.bsh i{position:absolute;left:50%;top:45%;width:16px;height:11px;background:var(--c);opacity:0;clip-path:polygon(0 0,100% 30%,60% 100%)}#booster.smash .bsh i{animation:bshard .95s ease-out forwards}
+.bcards{position:absolute;inset:0 0 56px;display:flex;align-items:center;justify-content:center;gap:min(26px,4vw);pointer-events:none}
+.bcard{position:relative;width:min(185px,40vw,46vh);aspect-ratio:3/4.1;border-radius:14px;background:linear-gradient(170deg,#26282d,#121316);border:3px solid var(--rc);box-shadow:0 0 34px var(--rc);display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:10px 8px;color:#fff;text-align:center;animation:bflip .75s cubic-bezier(.2,1.3,.4,1) both;isolation:isolate;overflow:hidden}
+.bcard::before{content:'';position:absolute;left:-50%;top:-50%;width:200%;height:200%;z-index:-1;background:conic-gradient(from 0deg,transparent,var(--rc) 10%,transparent 25%,var(--rc) 50%,transparent 65%);opacity:var(--ro,.18);animation:bspin 6s linear infinite}
+.bcard .rr{font-size:10px;letter-spacing:.2em;color:var(--rc);font-weight:800}.bcard svg{width:94%;height:auto}.bcard b{font-size:clamp(12px,2.6vw,15px);line-height:1.15}.bcard small{font-size:10px;color:#b8bbc0;display:block}
+.bcard em{font-style:normal;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px;background:#3ecf8e;color:#04150c}.bcard em.dup{background:#f2c40f;color:#1a1200}
+.bbtns{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:0;right:0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 12px;animation:fadein .5s 1.3s both}
+.bbtns button{background:#2a2c30;border:1px solid #3a3d42;color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;letter-spacing:.08em;font-size:12px}.bbtns button.main{background:var(--accent);border-color:var(--accent);color:#160800}
+.btap{position:absolute;bottom:12%;width:100%;text-align:center;color:#ddd;letter-spacing:.3em;font-size:11px;animation:bpulse 1s infinite}#booster.smash .btap{display:none}
+.bshop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bpk{border:0;border-radius:12px;padding:8px 6px 10px;background:linear-gradient(160deg,var(--c1),var(--c2));color:#fff;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
+.bpk svg{width:100%;height:auto}.bpk b{font-size:10px;letter-spacing:.08em}.bpk small{font-size:9px;opacity:.85}.bpk em{font-style:normal;font-weight:800;font-size:12px;background:rgba(0,0,0,.35);border-radius:6px;padding:2px 8px}.bpk em.free{background:#3ecf8e;color:#04150c}
+.bpk::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 45%,transparent 60%);background-size:250% 100%;animation:bshine 3s linear infinite;pointer-events:none}
+.ilogo{width:min(78vw,470px);animation:crush .9s cubic-bezier(.2,1.6,.4,1) both}.ilogo svg{width:100%;height:auto;filter:drop-shadow(0 10px 30px #000)}
+@keyframes bdrop{0%{transform:translateY(-120vh) rotate(-14deg)}100%{transform:none}}
+@keyframes bshake{0%{transform:rotate(-3deg) scale(1.03)}50%{transform:rotate(3deg) scale(1.06)}100%{transform:rotate(-3deg) scale(1.03)}}
+@keyframes bquake{0%,100%{transform:none}20%{transform:translate(-12px,8px)}40%{transform:translate(10px,-10px)}60%{transform:translate(-8px,6px)}80%{transform:translate(6px,-4px)}}
+@keyframes bflash{0%{opacity:.95}100%{opacity:0}}
+@keyframes bstamp{0%{transform:translate(-50%,-50%) scale(3) rotate(-8deg);opacity:0}22%{transform:translate(-50%,-50%) scale(1) rotate(-8deg);opacity:1}70%{opacity:1;transform:translate(-50%,-50%) scale(1.06) rotate(-8deg)}100%{opacity:0;transform:translate(-50%,-120%) scale(.9) rotate(-8deg)}}
+@keyframes bshard{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r))}}
+@keyframes bflip{0%{transform:perspective(800px) rotateY(180deg) scale(.3);opacity:0}100%{transform:perspective(800px) rotateY(0) scale(1);opacity:1}}
+@keyframes bspin{to{transform:rotate(360deg)}}@keyframes bshine{0%{background-position:150% 0}100%{background-position:-100% 0}}@keyframes bpulse{50%{opacity:.4}}
+#rewfx{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;z-index:6;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 2px,transparent 2px 6px),linear-gradient(90deg,rgba(80,160,255,.18),rgba(255,60,160,.18))}#hRew{font-size:12px}#multi .pl em{font-style:normal;font-size:11px;color:#f2c40f}.sesg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}.sesg div{background:#202226;border-radius:8px;padding:8px}.sesg small{display:block;color:#9a9da3;font-size:10px}.sesg b{font-size:18px}#moments{position:fixed;inset:0;z-index:67;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:12px}#moments[hidden],#phoBar[hidden]{display:none}#moments .gbox{width:min(520px,94vw);max-height:88vh;overflow-y:auto;background:#15161a;border:1px solid var(--line);border-radius:14px;padding:14px 18px;zoom:var(--uk,1)}#moments h3{margin:0 0 8px;color:var(--accent2);letter-spacing:.15em}#moments .pbtn{display:block;margin:12px auto 0}
 #phoBar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);display:flex;gap:10px;z-index:40;zoom:var(--uk,1)}#phoQuit{background:#2a2c30;color:#fff}
 #tuto{position:fixed;inset:0;z-index:66;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}#tuto[hidden]{display:none}
 #tuto .tbox{width:min(340px,92vw);background:#15161a;border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:center;zoom:var(--uk,1)}#tuto .ti{font-size:40px;animation:tb 1s ease-in-out infinite}@keyframes tb{50%{transform:translateY(-6px) scale(1.08)}}
@@ -314,7 +348,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 
 <div id="menu">
   <div id="mhead">
-    <div class="logo"><i></i>SMASHR · GARAGE <span id="collN" style="opacity:.6"></span></div><div id="rewfx"></div>
+    <div class="logo"><i></i>SMASHR · GARAGE <span id="collN" style="opacity:.6"></span></div>
     <div id="mBrand">BMW</div>
     <div id="mName">E30 116i</div><div id="peek" hidden><button class="ghost" id="peekBack">← RETOUR À MA VOITURE</button></div>
     <div id="mSpecs"></div>
@@ -375,7 +409,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
   </div><button id="pickOk">C'EST PARTI</button></div></div>
 <div id="replayBar" hidden><b>RALENTI</b><div class="bar"><i></i></div><button id="replayStop">QUITTER</button></div>
 <div id="buyfx" hidden><span>ACHETÉ !</span><b></b><small></small></div><div id="coins"></div>
-<div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="moments" hidden></div><div id="phoBar" hidden><button class="pbtn" id="phoTake">📸 PRENDRE LA PHOTO</button><button class="pbtn" id="phoQuit">✖ QUITTER</button></div><div id="lostCard" hidden></div><div id="intro"><div class="lg"><b style="font-size:clamp(52px,13vw,120px)">SMASH<span style="color:var(--accent2)">R</span></b><small>le jeu de voitures qui se cabossent</small></div></div><div id="guide" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
+<div id="rewfx"></div><div id="booster" hidden></div><div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="moments" hidden></div><div id="phoBar" hidden><button class="pbtn" id="phoTake">📸 PRENDRE LA PHOTO</button><button class="pbtn" id="phoQuit">✖ QUITTER</button></div><div id="lostCard" hidden></div><div id="intro"><div class="lg"><b style="font-size:clamp(52px,13vw,120px)">SMASH<span style="color:var(--accent2)">R</span></b><small>le jeu de voitures qui se cabossent</small></div></div><div id="guide" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
 <div id="dead" hidden><b>VOITURE DÉTRUITE</b><p id="dTxt">Nouvelle voiture dans 5 s</p><button id="dRepair">REPARTIR MAINTENANT</button></div>
 <div id="loading">CHARGEMENT…</div>
 
@@ -2037,7 +2071,7 @@ function dirtTick(dt,p){const cr=p.crisp,sp=Math.abs(p.vF);let add=0;if(sp>3){if
 function statTick(dt,p){if(statT>4.9){sponTick();dailyTick()}STATS.time+=dt;STATS.km+=Math.abs(p.vF)*dt/1000;mastTick(p,Math.abs(p.vF)*dt/1000);STATS.vmax=Math.max(STATS.vmax,Math.abs(p.vF)*3.6);statT+=dt;if(statT>5){statT=0;statSave()}}
 function renderProf(){const el=$('#prof');const l=lvlOf(STATS.xp),a=xpFor(l),b=xpFor(l+1),h=Math.floor(STATS.time/3600),m=Math.floor(STATS.time/60)%60;
   el.innerHTML=`<button class="btn2" id="gOpen" style="width:100%">📖 GUIDE DU JEU</button><div class="opt"><h4>${escH(NET.nick||'PILOTE')} <b>${titleOf(l)}</b></h4><div class="lvl"><b>${l}</b><div><small style="color:var(--mute);font-size:11px">NIVEAU · ${Math.round(STATS.xp-a).toLocaleString('fr-FR')} / ${(b-a).toLocaleString('fr-FR')} XP</small><div class="xp"><i style="width:${Math.min(100,(STATS.xp-a)/(b-a)*100)}%"></i></div></div></div></div>
-  <div class="pst">${[['KM PARCOURUS',STATS.km.toFixed(1).replace('.',',')],['TEMPS DE JEU',h+' h '+m+' min'],['CHOCS',STATS.crash],['EXPLOSIONS',STATS.boom],['TONNEAUX',STATS.flip],['VITESSE MAX',Math.round(STATS.vmax)+' km/h'],['COURSES GAGNÉES',STATS.race],['BUTS',STATS.goal],['RECORD DE SCORE',SC.best.toLocaleString('fr-FR')],['ARGENT',BANK.cash.toLocaleString('fr-FR')+' €']].map(([k,v])=>`<div><small>${k}</small><b>${v}</b></div>`).join('')}</div>
+  <div class="pst">${[['KM PARCOURUS',STATS.km.toFixed(1).replace('.',',')],['TEMPS DE JEU',h+' h '+m+' min'],['CHOCS',STATS.crash],['EXPLOSIONS',STATS.boom],['TONNEAUX',STATS.flip],['VITESSE MAX',Math.round(STATS.vmax)+' km/h'],['COURSES GAGNÉES',STATS.race],['BUTS',STATS.goal],['RECORD DE SCORE',SC.best.toLocaleString('fr-FR')],['BOOSTERS OUVERTS',STATS.boosters|0],['ARGENT',BANK.cash.toLocaleString('fr-FR')+' €']].map(([k,v])=>`<div><small>${k}</small><b>${v}</b></div>`).join('')}</div>
   <div class="opt"><h4>TITRES</h4><div class="titles">${TITLES.map(([n,t])=>`<span class="${l>=n?'on':''}">${t} · niv. ${n}</span>`).join('')}</div></div>`+dailyHTML()+sponHTML()+treHTML()+collHTML()+saveHTML()}
 const SC={score:+(store.get('tf_score')||0),best:+(store.get('tf_best')||0),combo:1,lastT:-9,saveT:0};
 /* ---------- ARGENT & ATELIER : 1 € pour 10 points, améliorations valables pour toutes les voitures ---------- */
@@ -2080,7 +2114,7 @@ $('#shop').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   if(b.dataset.derby){PENDING='derby';startGame()}
   if(b.dataset.ev){PENDING=b.dataset.ev;startGame()}});
 function addScore(pts,label,big){if(state!=='game'||pts<=0)return;SC.combo=simTime-SC.lastT<3?Math.min(5,SC.combo+1):1;SC.lastT=simTime;
-  const v=Math.round(pts*SC.combo/10)*10;SC.score+=v;store.set('tf_score',SC.score);{const k='tf_bestc_'+selected.id;if(SC.score>+(store.get(k)||0))store.set(k,SC.score)}earn(Math.round(v/10));{const l0=lvlOf(STATS.xp);STATS.xp+=v/10;const l1=lvlOf(STATS.xp);if(l1>l0)setTimeout(()=>{toast('NIVEAU '+l1+' ! '+titleOf(l1).toUpperCase());statSave()},700)}if(SC.score>WK.best){WK.best=SC.score;WK.dirty=1}if(SC.score>SC.best){SC.best=SC.score;store.set('tf_best',SC.best)}
+  const v=Math.round(pts*SC.combo/10)*10;SC.score+=v;store.set('tf_score',SC.score);{const k='tf_bestc_'+selected.id;if(SC.score>+(store.get(k)||0))store.set(k,SC.score)}earn(Math.round(v/10));{const l0=lvlOf(STATS.xp);STATS.xp+=v/10;const l1=lvlOf(STATS.xp);if(l1>l0)setTimeout(()=>{toast('NIVEAU '+l1+' ! '+titleOf(l1).toUpperCase());statSave();bstLevel(l1)},700)}if(SC.score>WK.best){WK.best=SC.score;WK.dirty=1}if(SC.score>SC.best){SC.best=SC.score;store.set('tf_best',SC.best)}
   const el=document.createElement('span');el.textContent=label+'  +'+v.toLocaleString('fr-FR')+(SC.combo>1?'  ×'+SC.combo:'');if(big||SC.combo>2)el.className='big';
   const box=$('#pops');box.appendChild(el);while(box.children.length>3)box.firstChild.remove();setTimeout(()=>el.remove(),1300)}
 function updScore(){$('#scoreTxt').textContent=SC.score.toLocaleString('fr-FR');$('#bestTxt').textContent=SC.best.toLocaleString('fr-FR');$('#comboTxt').textContent=simTime-SC.lastT<3&&SC.combo>1?'×'+SC.combo:''}
@@ -2892,7 +2926,11 @@ const GROUPS={
   monster:{need:1800,time:600,name:'MONSTER TRUCKS',chip:'MONSTER',open:'MONSTER TRUCKS DÉBLOQUÉS PENDANT 10 MIN !',end:'LES MONSTER TRUCKS RENTRENT AU GARAGE',kp:'tf_play_m',kl:'tf_unl_m',note:'30 min de jeu débloquent les monster trucks pendant 10 min.'}};
 for(const g of Object.values(GROUPS)){g.play=+(store.get(g.kp)||0);g.left=+(store.get(g.kl)||0)}
 let OWNED={};try{OWNED=JSON.parse(store.get('tf_owned')||'{}')||{}}catch(e){}
-const carPrice=c=>c.truck||c.monster?0:c.hp<=110?0:Math.round(c.hp*12/500)*500;
+const STARTER='bmw-e30-116i';
+const carPrice=c=>c.truck||c.monster?0:c.id===STARTER?0:Math.max(3000,Math.round((c.hp*20+1000)/500)*500);
+if(!store.get('tf_mig_smashr')){store.set('tf_mig_smashr','1');let dr={};try{dr=JSON.parse(store.get('tf_stats')||'{}').driven||{}}catch(e){}const fresh=store.get('tf_cash')==null&&!Object.keys(dr).length;
+  for(const c of CARS)if(!c.truck&&!c.monster&&!c.race&&c.hp<=110&&(dr[c.id]||c.id===store.get('tf_car')))OWNED[c.id]=1;store.set('tf_owned',JSON.stringify(OWNED));
+  if(fresh){BANK.cash=5000;store.set('tf_cash',5000);setTimeout(()=>toast('BIENVENUE ! 1 VOITURE OFFERTE + 5 000 € POUR TON PREMIER BOOSTER'),4200)}}
 const RACE_UNL={champ:'GAGNE LE CHAMPIONNAT',rally:'GAGNE LE RALLYE (CARTE DÉSERT)',chase:'RÉUSSIS LA POURSUITE POLICE'};
 const owned=c=>c.race?store.get('tf_rc_'+c.race)==='1':(!carPrice(c)||OWNED[c.id]);
 function unlockRace(k){if(store.get('tf_rc_'+k)==='1')return;store.set('tf_rc_'+k,'1');const c=CARS.find(x=>x.race===k);if(c)setTimeout(()=>toast('VOITURE DÉBLOQUÉE : '+c.name.toUpperCase()+' !'),2500)}
@@ -2910,7 +2948,7 @@ function unlockTick(dt){
 function updUnlockUI(){
   for(const [k,g] of Object.entries(GROUPS)){const h=document.getElementById('state-'+k);if(h)h.textContent=g.left>0?'DÉBLOQUÉS · '+mmss(g.left):'VERROUILLÉS · encore '+mmss(g.need-g.play)+' de jeu';
     document.querySelectorAll('.card.lock[data-g="'+k+'"]').forEach(e=>e.classList.toggle('locked',!(g.left>0)))}
-  {const cn=$('#collN');if(cn)cn.textContent='· '+CARS.filter(c=>owned(c)).length+'/'+CARS.length+' voitures'}const go=$('#go'),k=groupOf(selected),lock=k&&!(GROUPS[k].left>0),pr=carPrice(selected);go.disabled=!!lock;go.classList.toggle('buy',!owned(selected));
+  {const cn=$('#collN');if(cn)cn.textContent='· '+CARS.filter(c=>owned(c)&&!groupOf(c)).length+'/'+CARS.filter(c=>!groupOf(c)).length+' voitures'}const go=$('#go'),k=groupOf(selected),lock=k&&!(GROUPS[k].left>0),pr=carPrice(selected);go.disabled=!!lock;go.classList.toggle('buy',!owned(selected));
   const rl=selected.race&&!owned(selected);if(rl)go.disabled=true;
   go.textContent=rl?'À GAGNER : '+RACE_UNL[selected.race]:lock?'VERROUILLÉ · '+mmss(GROUPS[k].need-GROUPS[k].play):!owned(selected)?'ACHETER · '+pr.toLocaleString('fr-FR')+' €':'CONDUIRE';
   document.querySelectorAll('.card').forEach(e=>{const c=CARS.find(x=>x.id===e.dataset.id);if(c)e.classList.toggle('notown',!owned(c))});
@@ -2920,7 +2958,7 @@ function swapToCar(c){selected=c;store.set('tf_car',c.id);selectCar(c);if(!playe
   player=new Car(specFor(c));player.setPose(x,z,a);cars.push(player);game.add(player.group);upgCalipers(player);netReset()}
 let state='menu',selected=CARS.find(c=>c.id===store.get('tf_car'))||CARS[0];
 function buildMenu(){
-  const bar=$('#brandBar'),list=$('#list');
+  const bar=$('#brandBar'),list=$('#list');bstSection(bar,list);
   for(const [k,label,list2] of [['truck','Camions',TRUCKS],['monster','Monster trucks',MONSTERS]]){const g=GROUPS[k];
    const btn=document.createElement('button');btn.textContent=label;btn.dataset.b='__'+k;btn.onclick=()=>{const sec=document.getElementById('b-'+k);list.scrollTo({top:sec.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(btn);
    const sec=document.createElement('section');sec.id='b-'+k;sec.innerHTML=`<h3><span>${g.name}</span><span id="state-${k}"></span></h3><p class="tnote">${g.note}</p>`;
@@ -4142,6 +4180,46 @@ function mktHTML(){const mine=CARS.filter(c=>OWNED[c.id]&&carPrice(c)>0),offers=
     :'<small>Achète des voitures au garage pour pouvoir les revendre ici.</small>';
   return `<div class="opt"><h4>MARCHÉ AUX VOITURES <b>entre joueurs</b></h4>${sell}${offers.length?offers.map(o=>`<div class="race"><b>${escH(o.c.brand+' '+o.c.name)}</b><small>${escH(String(o.q.presence.n||'Pilote').slice(0,16))} · ${o.pr.toLocaleString('fr-FR')} €</small><button data-mkbuy="${escH(o.q.peer)}" ${owned(o.c)?'disabled':''}>${owned(o.c)?'DÉJÀ À TOI':'ACHETER'}</button></div>`).join(''):'<small>Aucune voiture en vente pour l\'instant.</small>'}</div>`}
 
+
+/* ---------- logo SMASHR ---------- */
+function smashrLogo(w){const pts=[];for(let i=0;i<28;i++){const a=i/28*Math.PI*2,r=i%2?.64:1,j=1+((i*37)%7)/30;pts.push((120+Math.cos(a)*112*r*j).toFixed(1)+','+(60+Math.sin(a)*54*r*j).toFixed(1))}const id='sg'+(++smashrLogo.n);
+  return `<svg viewBox="0 0 240 120" role="img" aria-label="SMASHR"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset=".55" stop-color="#ff7a1a"/><stop offset="1" stop-color="#e0300b"/></linearGradient></defs><polygon points="${pts.join(' ')}" fill="#15161a" stroke="#ff5b1f" stroke-width="4" stroke-linejoin="round"/><g transform="translate(120 76) skewX(-10)"><text text-anchor="middle" font-family="'Chakra Petch',Arial Black,Arial" font-weight="900" font-size="54" letter-spacing="1" fill="url(#${id})" stroke="#160800" stroke-width="5" paint-order="stroke">SMASHR</text></g><polyline points="66,38 90,57 82,66 108,86" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><polyline points="162,32 151,51 172,60 160,90" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/></svg>`}
+smashrLogo.n=0;
+{const b=document.querySelector('#intro .lg b');if(b){const d=document.createElement('div');d.className='ilogo';d.innerHTML=smashrLogo();b.replaceWith(d)}}
+const carSVG=col=>`<svg viewBox="0 0 120 50"><ellipse cx="61" cy="45" rx="54" ry="3.5" fill="#000" opacity=".45"/><path d="M8 36 L10 26 Q12 22 20 21 L38 19 L52 9 Q56 7 64 7 L84 8 Q90 9 95 16 L104 20 Q112 22 113 28 L114 36 Z" fill="${col}" stroke="#000" stroke-opacity=".45" stroke-width="1.5"/><path d="M42 19 L54 11 Q57 10 63 10 L72 10 L73 19 Z M76 10 L84 10.5 Q88 11 91 16 L92 19 L77 19 Z" fill="#9fc7e8" opacity=".85"/><circle cx="30" cy="37" r="8" fill="#151618"/><circle cx="30" cy="37" r="4" fill="#c9ccd1"/><circle cx="92" cy="37" r="8" fill="#151618"/><circle cx="92" cy="37" r="4" fill="#c9ccd1"/></svg>`;
+
+/* ---------- boosters : 2 voitures au hasard ---------- */
+const BST_T=[{n:'PETIT BOOSTER',min:0,max:120,pr:5000,c1:'#2bb3ff',c2:'#0b3d91'},{n:'BOOSTER SPORT',min:121,max:250,pr:10000,c1:'#ff5b1f',c2:'#7a1a05'},{n:'BOOSTER BOLIDE',min:251,max:99999,pr:20000,c1:'#e2b53e',c2:'#3a2605'}];
+const RAR=[['COMMUNE','#9aa0a8',10],['RARE','#2bb3ff',6],['ÉPIQUE','#b46cff',3],['LÉGENDAIRE','#f2c40f',1]];
+const BST={free:+(store.get('tf_bfree')||0),last:-1};
+function bstPool(t){return CARS.filter(c=>!groupOf(c)&&!c.race&&c.id!==STARTER&&c.hp>=t.min&&c.hp<=t.max)}
+function bstRar(c,pool){const n=pool.filter(x=>x.hp<c.hp).length/pool.length;return n>=.9?3:n>=.68?2:n>=.38?1:0}
+function bstPick(t){const pool=bstPool(t),out=[];for(let k=0;k<2;k++){let cand=pool.filter(c=>!owned(c)&&!out.includes(c));if(!cand.length)cand=pool.filter(c=>!out.includes(c));if(!cand.length)cand=pool;
+    const ws=cand.map(c=>RAR[bstRar(c,pool)][2]);let r=Math.random()*ws.reduce((a,b)=>a+b,0),i=0;while(i<ws.length-1&&r>ws[i]){r-=ws[i];i++}out.push(cand[i])}
+  return out.map(c=>({c,rar:bstRar(c,pool),dup:owned(c)}))}
+function bstRange(t){return t.max>9999?'plus de '+(t.min-1)+' ch':(t.min||bstPool(t).reduce((m,c)=>Math.min(m,c.hp),999))+' à '+t.max+' ch'}
+function bstShopHTML(){return BST_T.map((t,i)=>{const free=i===0&&BST.free>0;return `<button class="bpk" data-bst="${i}" style="--c1:${t.c1};--c2:${t.c2}">${smashrLogo()}<b>${t.n}</b><small>2 voitures · ${bstRange(t)}</small><em class="${free?'free':''}">${free?'GRATUIT ×'+BST.free:t.pr.toLocaleString('fr-FR')+' €'}</em></button>`}).join('')}
+function bstSection(bar,list){const btn=document.createElement('button');btn.textContent='🎁 Boosters';btn.dataset.b='__boost';btn.onclick=()=>list.scrollTo({top:0,behavior:'smooth'});bar.appendChild(btn);
+  const sec=document.createElement('section');sec.id='b-boost';sec.innerHTML=`<h3><span>BOOSTERS SMASHR</span><span>2 voitures au hasard</span></h3><div class="bshop">${bstShopHTML()}</div><p class="tnote">Nouvelles voitures en priorité · doublon remboursé à 50 % · un petit booster offert tous les 5 niveaux</p>`;
+  sec.addEventListener('click',e=>{const b=e.target.closest('[data-bst]');if(b)bstBuy(+b.dataset.bst)});list.appendChild(sec)}
+function renderBst(){const el=document.querySelector('#b-boost .bshop');if(el)el.innerHTML=bstShopHTML()}
+function bstLevel(l){if(l%5)return;BST.free++;store.set('tf_bfree',BST.free);setTimeout(()=>toast('🎁 NIVEAU '+l+' : PETIT BOOSTER OFFERT !'),2200);renderBst()}
+function bstBuy(i){const t=BST_T[i],free=i===0&&BST.free>0;if(!free&&BANK.cash<t.pr){toast('IL TE MANQUE '+(t.pr-BANK.cash).toLocaleString('fr-FR')+' €');return}
+  if(free){BST.free--;store.set('tf_bfree',BST.free)}else{BANK.cash-=t.pr;store.set('tf_cash',BANK.cash)}
+  const res=bstPick(t);for(const r of res){if(r.dup){r.ref=Math.round(carPrice(r.c)*.5/100)*100;earn(r.ref)}else OWNED[r.c.id]=1}store.set('tf_owned',JSON.stringify(OWNED));STATS.boosters=(STATS.boosters|0)+1;statSave();BST.last=i;renderBst();bstAnim(t,res)}
+function bstAnim(t,res){const el=$('#booster'),inner=`${smashrLogo()}<b>${t.n}</b><small>2 VOITURES · ${bstRange(t).toUpperCase()}</small>`;
+  let sh='';for(let k=0;k<22;k++){const a=Math.random()*6.283,d=120+Math.random()*260;sh+=`<i style="--c:${k%3?t.c1:'#fff'};--dx:${Math.cos(a)*d|0}px;--dy:${Math.sin(a)*d|0}px;--r:${(Math.random()*720-360)|0}deg"></i>`}
+  el.className='';el.innerHTML=`<div class="bpack"><div class="bh l" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div><div class="bh r" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div></div><div class="bfl"></div><div class="bsh">${sh}</div><div class="bstamp">SMASH !</div><div class="bcards"></div><div class="btap">TOUCHE POUR ÉCRASER</div>`;el.hidden=false;
+  try{if(AC)sfxN(AC.currentTime,.45,'bandpass',500,1,.25,2600)}catch(e){}
+  let opened=false;const tm=[];const open=()=>{if(opened)return;opened=true;tm.forEach(clearTimeout);el.classList.remove('shake');void el.offsetWidth;el.classList.add('smash');vib(140);
+    try{if(AC){crashSound(1);sfxN(AC.currentTime,.7,'lowpass',260,1,.55)}}catch(e){}
+    setTimeout(()=>{const box=el.querySelector('.bcards');box.innerHTML=res.map((r,k)=>{const R=RAR[r.rar];return `<div class="bcard" style="--rc:${R[1]};--ro:${.12+r.rar*.12};animation-delay:${k*.38}s"><span class="rr">${R[0]}</span>${carSVG((customs[r.c.id]||{}).color||r.c.color||'#c41b1b')}<div><b>${escH(r.c.brand)}<br>${escH(r.c.name)}</b><small>${r.c.year} · ${r.c.hp} ch · ${r.c.vmax} km/h</small></div>${r.dup?`<em class="dup">DOUBLON · +${r.ref.toLocaleString('fr-FR')} €</em>`:'<em>NOUVELLE !</em>'}</div>`}).join('');
+      res.forEach((r,k)=>setTimeout(()=>{try{if(AC){const t0=AC.currentTime;sfxO(t0,.22,'triangle',520+r.rar*180,.13);sfxO(t0+.09,.3,'triangle',780+r.rar*240,.11)}}catch(e){}if(r.rar>=2)vib(60)},k*380+250));
+      const nw=res.find(r=>!r.dup)||res[0],again=BST_T[BST.last];
+      el.insertAdjacentHTML('beforeend',`<div class="bbtns"><button class="main" data-bx="see">VOIR LA ${escH(nw.c.name.toUpperCase().slice(0,18))}</button><button data-bx="again">ENCORE · ${(BST.last===0&&BST.free>0)?'GRATUIT':again.pr.toLocaleString('fr-FR')+' €'}</button><button data-bx="close">FERMER</button></div>`);
+      el.onclick=e=>{const b=e.target.closest('[data-bx]');if(!b)return;const k=b.dataset.bx;el.hidden=true;el.innerHTML='';if(k==='see'){selectCar(nw.c);const cd=document.querySelector('.card[data-id="'+nw.c.id+'"]');if(cd)cd.scrollIntoView({block:'center',behavior:'smooth'})}else{selectCar(selected);if(k==='again')bstBuy(BST.last)}}},650)};
+  el.onclick=()=>open();tm.push(setTimeout(()=>el.classList.add('shake'),700),setTimeout(open,2800))}
+
 let toastT=0;function toast(t){const e=$('#toast');e.textContent=t;e.classList.toggle('long',t.length>22);e.style.opacity=1;toastT=t.length>22?2.8:1.1}
 
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
@@ -4301,7 +4379,7 @@ function frame(now){
 /* démarrage */
 {const D=Object.getOwnPropertyDescriptor(Node.prototype,'textContent');for(const id of ['misChip','modeChip','raceChip','spd','dmgTxt','scoreTxt','bestTxt','comboTxt','unlChip','wanted']){const el=document.getElementById(id);if(el)Object.defineProperty(el,'textContent',{configurable:true,get(){return D.get.call(this)},set(v){v=v==null?'':String(v);if(this._tc!==v){this._tc=v;D.set.call(this,v)}}})}}
 buildMenu();resize();selectCar(selected);INTRO.t=0;linearize(show);netInit();applyQuality();$('#hRadio').textContent='RADIO : '+(RADIO_ST[RADIO.st]?RADIO_ST[RADIO.st].name:'OFF');addEventListener('pointerdown',()=>{if(RADIO.st&&AC&&!RADIO.timer)radioSet(RADIO.st)},{once:false,passive:true});$('#hWx').textContent='MÉTÉO : '+WX_NAMES[WX.mode];
-requestAnimationFrame(()=>{const sec=document.getElementById('b-'+slug(selected.brand)),list=$('#list');if(sec)list.scrollTop=sec.offsetTop-list.offsetTop;});
+requestAnimationFrame(()=>{const sec=document.getElementById('b-'+slug(selected.brand)),list=$('#list');if(Object.keys(OWNED).length<4){list.scrollTop=0;return}if(sec)list.scrollTop=sec.offsetTop-list.offsetTop;});
 $('#loading').hidden=true;
 requestAnimationFrame(frame);
 </script>
