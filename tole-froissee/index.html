@@ -2971,7 +2971,7 @@ function updUnlockUI(){
   {const cn=$('#collN');if(cn)cn.textContent='· '+CARS.filter(c=>owned(c)&&!groupOf(c)).length+'/'+CARS.filter(c=>!groupOf(c)).length+' voitures'}const go=$('#go'),k=groupOf(selected),lock=k&&!(GROUPS[k].left>0),pr=carPrice(selected);go.disabled=!!lock;go.classList.toggle('buy',!owned(selected));
   const rl=selected.race&&!owned(selected);if(rl)go.disabled=true;
   go.textContent=rl?'À GAGNER : '+RACE_UNL[selected.race]:lock?'VERROUILLÉ · '+mmss(GROUPS[k].need-GROUPS[k].play):!owned(selected)?'ACHETER · '+pr.toLocaleString('fr-FR')+' €':'CONDUIRE';
-  document.querySelectorAll('.card').forEach(e=>{const c=CARS.find(x=>x.id===e.dataset.id);if(c)e.classList.toggle('notown',!owned(c))});
+  renderMine();document.querySelectorAll('.card').forEach(e=>{const c=CARS.find(x=>x.id===e.dataset.id);if(c)e.classList.toggle('notown',!owned(c))});
 }
 function swapToCar(c){selected=c;store.set('tf_car',c.id);selectCar(c);if(!player||state!=='game')return;
   const x=player.x,z=player.z,a=player.a;game.remove(player.group);cars.splice(cars.indexOf(player),1);
@@ -4223,7 +4223,14 @@ function bstRange(t){return t.max>9999?'plus de '+(t.min-1)+' ch':(t.min||bstPoo
 function bstShopHTML(){return BST_T.map((t,i)=>{const free=i===0&&BST.free>0;return `<button class="bpk" data-bst="${i}" style="--c1:${t.c1};--c2:${t.c2}">${smashrLogo()}<b>${t.n}</b><small>2 voitures · ${bstRange(t)}</small><small>${t.up?`classe ${RAR[i][3]} · chance de ${RAR[i+1][3]}`:'classes A · S · X'}</small><em class="${free?'free':''}">${free?'GRATUIT ×'+BST.free:t.pr.toLocaleString('fr-FR')+' €'}</em></button>`}).join('')}
 function bstSection(bar,list){const btn=document.createElement('button');btn.textContent='🎁 Boosters';btn.dataset.b='__boost';btn.onclick=()=>list.scrollTo({top:0,behavior:'smooth'});bar.appendChild(btn);
   const sec=document.createElement('section');sec.id='b-boost';sec.innerHTML=`<h3><span>BOOSTERS SMASHR</span><span>2 voitures au hasard</span></h3><div class="bshop">${bstShopHTML()}</div><p class="tnote">Nouvelles voitures en priorité · doublon remboursé à 50 % · un petit booster offert tous les 5 niveaux</p>`;
-  sec.addEventListener('click',e=>{const b=e.target.closest('[data-bst]');if(b)bstBuy(+b.dataset.bst)});list.appendChild(sec)}
+  sec.addEventListener('click',e=>{const b=e.target.closest('[data-bst]');if(b)bstBuy(+b.dataset.bst)});list.appendChild(sec);
+  const b2=document.createElement('button');b2.textContent='⭐ Mes voitures';b2.dataset.b='__mine';b2.onclick=()=>{const m=document.getElementById('b-mine');list.scrollTo({top:m.offsetTop-list.offsetTop,behavior:'smooth'})};bar.appendChild(b2);
+  const mine=document.createElement('section');mine.id='b-mine';mine.innerHTML='<h3><span>MES VOITURES</span><span id="mineN"></span></h3><div class="cards" id="mineG"></div>';list.appendChild(mine);renderMine()}
+var _mineK='';
+function renderMine(){const g=document.getElementById('mineG');if(!g)return;const cs=CARS.filter(c=>owned(c)&&!groupOf(c)).sort((a,b)=>carRar(b)-carRar(a)||b.hp-a.hp),k=cs.map(c=>c.id).join(',')+'|'+selected.id;if(k===_mineK)return;_mineK=k;
+  g.innerHTML='';$('#mineN').textContent=cs.length+' / '+CARS.filter(c=>!groupOf(c)).length;
+  for(const c of cs){const el=document.createElement('button');el.className='card'+(c===selected?' on':'');el.dataset.id=c.id;el.innerHTML=`<span class="sw" style="background:${(customs[c.id]||{}).color||c.color}"></span><div><b>${escH(c.brand)} ${escH(c.name)}${mastStars(c.id)}</b><small>${c.year} · ${c.hp} ch</small></div>`;rarCard(el,c);el.onclick=()=>selectCar(c);g.appendChild(el)}
+  if(!cs.length)g.innerHTML='<p class="tnote">Ouvre un booster ou achète une voiture pour remplir ton garage.</p>'}
 function renderBst(){const el=document.querySelector('#b-boost .bshop');if(el)el.innerHTML=bstShopHTML()}
 function bstLevel(l){if(l%5)return;BST.free++;store.set('tf_bfree',BST.free);setTimeout(()=>toast('🎁 NIVEAU '+l+' : PETIT BOOSTER OFFERT !'),2200);renderBst()}
 function bstBuy(i){const t=BST_T[i],free=i===0&&BST.free>0;if(!free&&BANK.cash<t.pr){toast('IL TE MANQUE '+(t.pr-BANK.cash).toLocaleString('fr-FR')+' €');return}
