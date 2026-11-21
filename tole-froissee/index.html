@@ -530,10 +530,21 @@ C('Monster Trucks','Tôle Froissée',2026,1800,5000,140,MONSTER(5.9,2.5,{color:'
 CARS.push(...MONSTERS);
 // ---- voitures de course (à gagner)
 CARS.push(
-C('Tôle Racing','TR-01 Formule',2026,950,740,340,X('sport',4.9,1.95,.98,3.4,.33,{clr:.07,color:'#c41b1b',stripe:'#f2f2ee',wing:2,flare:.08,round:.22,lights:'slim',grille:'none',rim:'#d9dce0',race:'champ'})),
+C('Tôle Racing','TR-01 Formule',2026,950,740,340,X('sport',4.9,1.95,.98,3.4,.30,{clr:.07,hoodF:.5,hood:.7,color:'#c41b1b',stripe:'#f2f2ee',wing:2,flare:.08,round:.22,lights:'slim',grille:'none',rim:'#d9dce0',race:'champ'})),
 C('Tôle Racing','TR-R5 Rallye',2026,380,1230,230,X('hatch',4.1,1.82,1.42,2.55,.33,{clr:.22,color:'#f2f2ee',stripe:'#2b6bff',wing:1,flare:.07,kit:3,lights:'twin',rim:'#f2f2ee',race:'rally'})),
 C('Tôle Racing','TR-LMP Endurance',2026,680,930,330,X('sport',4.75,1.98,1.06,2.9,.34,{color:'#1b1c1f',stripe:'#ff5b1f',wing:2,flare:.06,lights:'slim',grille:'none',rim:'#ff5b1f',race:'chase'})));
-CARS.forEach(c=>{c.id=(c.brand+'-'+c.name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');
+const SHAPE_FIX={
+  'porsche-911-carrera-964':{crownF:-.05,hoodF:.57,hood:.77,ws:.31,roofF:.45,roofR:.55,rw:.97,trunk:.79,tail:.70,tailSlope:.09,nose:.12,roofExp:1.15},
+  'porsche-911-turbo-930':{crownF:-.05,hoodF:.57,hood:.77,ws:.31,roofF:.45,roofR:.55,rw:.97,trunk:.79,tail:.72,tailSlope:.08,nose:.12,roofExp:1.15},
+  'porsche-911-gt3-rs-992':{crownF:-.045,hoodF:.58,hood:.79,ws:.30,roofF:.44,roofR:.55,rw:.96,trunk:.80,tail:.74,tailSlope:.07,nose:.12,roofExp:1.2},
+  'lamborghini-countach-lp5000-qv':{hoodF:.44,hood:.70,ws:.18,roofF:.41,roofR:.57,crownF:-.03,roofExp:1.1},
+  'lamborghini-diablo':{hoodF:.43,hood:.70,ws:.19,roofF:.41,roofR:.55,crownF:-.03,roofExp:1.15},
+  'ferrari-f40':{hoodF:.45,hood:.72,crownF:-.025},'ferrari-testarossa':{hoodF:.47,crownF:-.02},'ferrari-308-gtb':{hoodF:.47,hood:.72,crownF:-.02,ws:.24},
+  'ferrari-enzo':{hoodF:.44,hood:.73,ws:.22,roofF:.41,roofR:.52,rw:.86,crownF:-.035},'ferrari-458-italia':{hoodF:.46,hood:.76,ws:.23,roofF:.42,roofR:.52,crownF:-.02},
+  'lamborghini-huracan':{hoodF:.45,hood:.74,ws:.22,roofF:.41,roofR:.53,roofExp:1.3},'bugatti-chiron':{hoodF:.5,hood:.78,ws:.24,roofF:.42,roofR:.52},
+  'mclaren-f1':{hoodF:.45,hood:.74,ws:.22,roofF:.43,roofR:.56,roofExp:1.3},'ford-gt40':{hoodF:.42,hood:.66,ws:.22,roofF:.42,roofR:.56,crownF:-.04,roofExp:1.2},
+  'audi-r8-v8':{hoodF:.52,roofR:.55,roofExp:1.3}};
+CARS.forEach(c=>{c.id=(c.brand+'-'+c.name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');if(SHAPE_FIX[c.id])Object.assign(c,SHAPE_FIX[c.id]);
   c.truck=!!c.truck;c.monster=!!c.monster;if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
 const ROADCARS=CARS.filter(c=>!c.truck&&!c.monster&&!c.race);
 const BUS=C('Ville','Bus urbain',2015,300,12000,90,Object.assign(X('van',11.5,2.55,3.1,6.0,.5,{color:'#2d6fb8',color2:'#f2f2ee',twoY:1.4,lights:'rect',grille:'wide',bumper:'black',ww:.32,clr:.3}),{npc:1}));
@@ -554,19 +565,28 @@ function makeShape(sp){
   if(rw<.93)pts.push([.955,sp.trunk-(sp.trunk-sp.tail)*.35]);
   pts.push([1,sp.tail]);
   const P=[];for(const q of pts)if(!P.length||q[0]>P[P.length-1][0]+1e-4)P.push(q);
-  const top=s=>{if(s<=0)return P[0][1];for(let i=1;i<P.length;i++)if(s<=P[i][0]){const t=(s-P[i-1][0])/(P[i][0]-P[i-1][0]);return P[i-1][1]+(P[i][1]-P[i-1][1])*t}return P[P.length-1][1]};
+  const nP=P.length,dX=[],dY=[],mT=[];for(let i=0;i<nP-1;i++){dX[i]=P[i+1][0]-P[i][0];dY[i]=(P[i+1][1]-P[i][1])/dX[i]}
+  mT[0]=dY[0];mT[nP-1]=dY[nP-2];for(let i=1;i<nP-1;i++)mT[i]=dY[i-1]*dY[i]<=0?0:(dY[i-1]+dY[i])/2;
+  for(let i=0;i<nP-1;i++){if(dY[i]===0){mT[i]=mT[i+1]=0;continue}const a=mT[i]/dY[i],b=mT[i+1]/dY[i],h=a*a+b*b;if(h>9){const t=3/Math.sqrt(h);mT[i]=t*a*dY[i];mT[i+1]=t*b*dY[i]}}
+  const top=s=>{if(s<=0)return P[0][1];if(s>=P[nP-1][0])return P[nP-1][1];let i=0;while(i<nP-2&&s>P[i+1][0])i++;const h=dX[i],t=(s-P[i][0])/h,t2=t*t,t3=t2*t;
+    return(2*t3-3*t2+1)*P[i][1]+(t3-2*t2+t)*h*mT[i]+(-2*t3+3*t2)*P[i+1][1]+(t3-t2)*h*mT[i+1]};
   const fo=sp.fo??(L-sp.wb)/2, axF=L/2-fo, axR=axF-sp.wb;
   const bottom=s=>sp.clr+.07*Math.max(0,1-s/.07)**2+.07*Math.max(0,(s-.93)/.07)**2;
-  const hwBase=(s,fy)=>{const e=s<.14?1-s/.14:s>.86?(s-.86)/.14:0;let hw=W/2*(1-sp.round*e*e);
-    if(fy>.62)hw*=1-.12*((fy-.62)/.38)**1.7; if(fy<.2)hw*=1-.035*(.2-fy)/.2; return hw};
-  const flareAt=(z,fy)=>{if(!sp.flare||fy>.9)return 0;let f=0;for(const az of [axF,axR]){const d=Math.abs(z-az)/(sp.wr*2);if(d<1)f=Math.max(f,sp.flare*(.5+.5*Math.cos(d*Math.PI)))}return f};
+  const yr=sp.year||1990,rnd=Math.max(sp.round||0,yr>=2005?.17:yr>=1995?.13:0),box=sp.truck||sp.monster||sp.npc||(sp.tumble||0)>.9;
+  const hwBase=(s,fy)=>{const e=s<.14?1-s/.14:s>.86?(s-.86)/.14:0;let hw=W/2*(1-rnd*e*e);
+    if(!box)hw*=1-.05*Math.max(0,1-s/.3)**2-.03*Math.max(0,(s-.72)/.28)**2;
+    if(fy>.6)hw*=1-(box?.07:.13)*((fy-.6)/.4)**1.6;else if(fy<.42)hw*=1-(box?.025:.06)*((.42-fy)/.42)**1.8;
+    if(!box)hw+=.011*Math.max(0,1-Math.abs(fy-.6)/.05);return hw};
+  const flareAt=(z,fy)=>{const fl=Math.max(sp.flare||0,box?0:.016);if(!fl||fy>.9)return 0;let f=0;for(const az of [axF,axR]){const d=Math.abs(z-az)/(sp.wr*2);if(d<1)f=Math.max(f,fl*(.5+.5*Math.cos(d*Math.PI)))}return f};
   const zAt=(s,fy)=>{let z=L/2-s*L;if(s<.1)z-=fy*sp.nose*(1-s/.1);if(s>.9)z+=fy*sp.tailSlope*((s-.9)/.1);return z};
   const roof=sG=>{const H=sp.H;
     if(sG<=sp.roofF){const t=clamp((sG-ws)/Math.max(1e-3,sp.roofF-ws),0,1),y0=top(ws);return y0+(H-y0)*(1-(1-t)**1.8)}
     if(sG<=sp.roofR)return H;
-    const t=clamp((sG-sp.roofR)/Math.max(1e-3,rw-sp.roofR),0,1),y1=top(rw);return H-(H-y1)*t**1.6};
+    const t=clamp((sG-sp.roofR)/Math.max(1e-3,rw-sp.roofR),0,1),y1=top(rw);return H-(H-y1)*t**(sp.roofExp||1.6)};
   const axles=[axF,axR];if(sp.ax3)axles.push(axR-sp.ax3);
-  return {top,bottom,hwBase,flareAt,zAt,roof,axF,axR,axles};
+  const archR=sp.wr+.075,archD=sp.noArch?0:Math.max(.06,(sp.ww||.2)+.035-(sp.flare||0)*.75-(sp.wheelOut||0));
+  const archAt=(z,y)=>{if(!archD)return 0;let lip=0;for(const az of axles){const dz=Math.abs(z-az),dy=y-sp.wr,d=dy>0?Math.hypot(dz,dy):dz;if(d<archR+.02)return -archD*smooth01(clamp((archR+.02-d)/.11,0,1));if(d<archR+.07)lip=Math.max(lip,.012*(1-Math.abs(d-archR-.035)/.035))}return lip};
+  return {top,bottom,hwBase,flareAt,zAt,roof,axF,axR,axles,archAt,archD};
 }
 
 // Boîte subdivisée remodelée : mapFn(fx,fy,u,out) → position, colorFn(face,fx,fy,u,x,y,z) → {c,g}
@@ -591,12 +611,14 @@ function buildBodyParts(sp,S){
   const SX=18,SY=12,SZ=46;
   const lower=boxPart(SX,SY,SZ,(fx,fy,s,v)=>{
     const z=S.zAt(s,fy),b=S.bottom(s),t=S.top(s),y=b+fy*(t-b);
-    const hw=S.hwBase(s,fy)+S.flareAt(z,fy);let x=(fx-.5)*2*hw;
-    v.x=x;v.y=y;v.z=z;
+    const ar=S.archAt(z,y),hw=S.hwBase(s,fy)+S.flareAt(z,fy)+(ar<0?ar*clamp((t-.05-y)/.06,0,1):ar);let x=(fx-.5)*2*hw;
+    const lid=clamp((sp.ws-.015-s)/.04,0,1),trk=clamp((s-sp.rw-.015)/.04,0,1),cr=(lid*(sp.crownF??.022)+trk*(sp.crownR??.018))*(1-(2*fx-1)**2)*fy**5;
+    v.x=x;v.y=y+cr;v.z=z;
   },(face,fx,fy,s,x,y,z)=>{
     let c=C1;
     if(sp.color2){const sc=face<=1?(Math.floor(s*SZ)+.5)/SZ:s,rc=face<=1?(Math.floor(fy*SY)+.5)/SY:fy,yq=S.bottom(sc)+rc*(S.top(sc)-S.bottom(sc));if((face<=1?yq:y)<sp.twoY)c=C2}
     if(face===3)return{c:rgb(K.under)};
+    if(face<=1&&S.archD){const k=-S.archAt(z,y)/S.archD;if(k>0)c=mul(c,1-.8*k)}
     if(face<=1&&fy<.1)c=mul(c,.72);
     if(face===2){
       if(sp.pickup&&s>sp.rw+.015&&s<.975&&Math.abs(fx-.5)<.42)return{c:rgb(K.bed)};
@@ -778,7 +800,7 @@ function buildDetailGeo(sp,S){
   }
   // passages de roue
   if(!sp.noArch)for(const az of S.axles)for(const sg of [-1,1]){const s=(sp.L/2-az)/sp.L,fy=clamp((sp.wr-S.bottom(s))/(S.top(s)-S.bottom(s)),0,1);
-    const x=sg*(S.hwBase(s,Math.max(.25,fy))+S.flareAt(az,.5)+.004);
+    const x=sg*(S.hwBase(s,Math.max(.25,fy))+S.flareAt(az,.5)-S.archD+.006);
     add(new THREE.CircleGeometry(sp.wr+.075,22,0,Math.PI),K.arch,x,sp.wr,az,0,sg*Math.PI/2,0,'YXZ');
     add(new THREE.PlaneGeometry(2*(sp.wr+.075),Math.max(.01,sp.wr-S.bottom(s)+.02)),K.arch,x,(sp.wr+S.bottom(s)-.02)/2,az,0,sg*Math.PI/2,0,'YXZ');
     add(new THREE.RingGeometry(sp.wr+.07,sp.wr+.115,24,1,0,Math.PI),sp.color,x+sg*.006,sp.wr,az,0,sg*Math.PI/2,0,'YXZ')}
