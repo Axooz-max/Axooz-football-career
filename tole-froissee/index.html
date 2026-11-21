@@ -3678,7 +3678,7 @@ function startGame(){if(WORK.on)workClear();
   if(!isOpen(selected)){toast(GROUPS[groupOf(selected)].name+' VERROUILLÉS');return}
   $('#loading').hidden=false;
   setTimeout(()=>{
-    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();if(MAP==='city'){spawnTraffic();spawnPeds(200);spawnCrossers(QUAL===0?10:24)}buildPickups();buildStations()}finally{Math.random=r0}linearize(game)}
+    if(!worldBuilt){const r0=Math.random;Math.random=mulberry32(20261120);try{buildWorld();if(MAP==='city'){spawnTraffic();spawnPeds(300);spawnCrossers(QUAL===0?10:24)}buildPickups();buildStations()}finally{Math.random=r0}linearize(game)}
     if(player&&player.dead)respawnPlayer();
     if(!player||player.sp.base!==selected||player.sp.ckey!==custKey(selected)){
       let [x,z,a,nm]=pickSpawn();setTimeout(()=>toast('DÉPART '+nm),400);
