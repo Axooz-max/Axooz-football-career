@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0f1115">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Tôle Froissée</title>
+<title>SMASHR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&display=swap">
 <style>
@@ -314,7 +314,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 
 <div id="menu">
   <div id="mhead">
-    <div class="logo"><i></i>TÔLE FROISSÉE · GARAGE <span id="collN" style="opacity:.6"></span></div><div id="rewfx"></div>
+    <div class="logo"><i></i>SMASHR · GARAGE <span id="collN" style="opacity:.6"></span></div><div id="rewfx"></div>
     <div id="mBrand">BMW</div>
     <div id="mName">E30 116i</div><div id="peek" hidden><button class="ghost" id="peekBack">← RETOUR À MA VOITURE</button></div>
     <div id="mSpecs"></div>
@@ -375,7 +375,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
   </div><button id="pickOk">C'EST PARTI</button></div></div>
 <div id="replayBar" hidden><b>RALENTI</b><div class="bar"><i></i></div><button id="replayStop">QUITTER</button></div>
 <div id="buyfx" hidden><span>ACHETÉ !</span><b></b><small></small></div><div id="coins"></div>
-<div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="moments" hidden></div><div id="phoBar" hidden><button class="pbtn" id="phoTake">📸 PRENDRE LA PHOTO</button><button class="pbtn" id="phoQuit">✖ QUITTER</button></div><div id="lostCard" hidden></div><div id="intro"><div class="lg"><b>TÔLE</b><b>FROISSÉE</b><small>le jeu de voitures qui se cabossent</small></div></div><div id="guide" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
+<div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="moments" hidden></div><div id="phoBar" hidden><button class="pbtn" id="phoTake">📸 PRENDRE LA PHOTO</button><button class="pbtn" id="phoQuit">✖ QUITTER</button></div><div id="lostCard" hidden></div><div id="intro"><div class="lg"><b style="font-size:clamp(52px,13vw,120px)">SMASH<span style="color:var(--accent2)">R</span></b><small>le jeu de voitures qui se cabossent</small></div></div><div id="guide" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
 <div id="dead" hidden><b>VOITURE DÉTRUITE</b><p id="dTxt">Nouvelle voiture dans 5 s</p><button id="dRepair">REPARTIR MAINTENANT</button></div>
 <div id="loading">CHARGEMENT…</div>
 
@@ -580,6 +580,7 @@ const SHAPE_FIX={
   'jeep-wrangler-yj':{roofCam:.01,crownF:.008},'toyota-land-cruiser-j70':{roofCam:.012,crownF:.008},'ford-f-150':{roofCam:.015,crownF:.01},'toyota-hilux':{roofCam:.015,crownF:.01}};
 CARS.forEach(c=>{c.id=(c.brand+'-'+c.name).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-');if(SHAPE_FIX[c.id])Object.assign(c,SHAPE_FIX[c.id]);
   c.truck=!!c.truck;c.monster=!!c.monster;if(!c.ww)c.ww=clamp(.17+(c.W-1.55)*.2,.17,.27);if(!c.spokes)c.spokes=[5,6,7,10,5,8][Math.floor(hash3(c.L,c.W,c.hp)*6)];});
+CARS.forEach(c=>{if(c.brand==='Tôle Racing')c.brand='SMASHR Racing';if(c.name==='Tôle Froissée')c.name='Smashr'});
 const ROADCARS=CARS.filter(c=>!c.truck&&!c.monster&&!c.race);
 const BUS=C('Ville','Bus urbain',2015,300,12000,90,Object.assign(X('van',11.5,2.55,3.1,6.0,.5,{color:'#2d6fb8',color2:'#f2f2ee',twoY:1.4,lights:'rect',grille:'wide',bumper:'black',ww:.32,clr:.3}),{npc:1}));
 BUS.id='npc-bus';BUS.spokes=8;
@@ -1248,7 +1249,7 @@ function updTL(dt,force){TLIGHTS.t=(TLIGHTS.t+dt)%16;TLIGHTS.acc+=dt;if(!force&&
   TLIGHTS.mesh.instanceColor.needsUpdate=true}
 // affiches publicitaires (marques imaginaires)
 const AD_TEX=(()=>{const c=document.createElement('canvas');c.width=512;c.height=640;const g=c.getContext('2d');
-  const ads=[['#ff5b1f','#160800','TÔLE FROISSÉE','le jeu qui plie la tôle'],['#1f4bb8','#ffffff','GARAGE DU COIN','réparation 24 h/24'],['#ffd21f','#111111','PNEUS ÉCLAIR','montés en 10 minutes'],['#4a2c1c','#f5e6c8','CAFÉ CHROME','l\'expresso à 1 €'],['#2b8a3e','#ffffff','ZÉRO RAYURE','l\'assurance qui rembourse tout']];
+  const ads=[['#ff5b1f','#160800','SMASHR','le jeu qui plie la tôle'],['#1f4bb8','#ffffff','GARAGE DU COIN','réparation 24 h/24'],['#ffd21f','#111111','PNEUS ÉCLAIR','montés en 10 minutes'],['#4a2c1c','#f5e6c8','CAFÉ CHROME','l\'expresso à 1 €'],['#2b8a3e','#ffffff','ZÉRO RAYURE','l\'assurance qui rembourse tout']];
   ads.forEach(([bg,fg,t1,t2],i)=>{const y=i*128;g.fillStyle=bg;g.fillRect(0,y,512,128);g.fillStyle=fg;g.textAlign='center';g.font="bold 54px 'Chakra Petch',Arial,sans-serif";g.fillText(t1,256,y+66,490);
     g.font="28px 'Chakra Petch',Arial,sans-serif";g.globalAlpha=.85;g.fillText(t2,256,y+108,490);g.globalAlpha=1;g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=4;g.strokeRect(6,y+6,500,116)});
   const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t})();
@@ -2699,7 +2700,7 @@ function radioDrum(t,kind){const s=AC.createBufferSource();s.buffer=noiseBuf;con
 function radioTick(){if(!AC||!RADIO.st)return;const S=RADIO_ST[RADIO.st],spb=60/S.bpm/2;radioDJ();while(RADIO.next<AC.currentTime+.15){const t0=RADIO.next,i=RADIO.step%8,tr=S.prog?S.prog[(RADIO.step>>3)%4]:0,t=t0+(S.swing&&i%2?spb*S.swing:0);if(i===0)for(const iv of [0,S.name==='RAP'?3:4,7])radioNote(t,mtof(48+tr+iv),spb*7,'triangle',.035);
     if(S.bass[i])radioNote(t,mtof(S.bass[i]+tr),spb*.9,S.wave,.16);if(S.kick[i])radioDrum(t,'k');if(S.snare[i])radioDrum(t,'s');radioDrum(t,'h');
     if(S.lead[i]&&(RADIO.step>>3)%2)radioNote(t,mtof(S.lead[i]+tr+((RADIO.step>>4)%2?12:0)*(S.name==='ÉLECTRO'?1:0)),spb*.8,S.name==='JAZZ'?'sine':'square',.05);RADIO.step++;RADIO.next+=spb}}
-let DJT=40;function radioDJ(){DJT-=.04;if(DJT>0||state!=='game'||muted)return;DJT=70+Math.random()*50;const S=RADIO_ST[RADIO.st],L=['Vous écoutez Radio Tôle '+S.name.toLowerCase()+' ! Restez prudents sur la route… ou pas !','Radio Tôle, '+S.name.toLowerCase()+' ! On continue avec du bon son.','Ici Radio Tôle. Attention, la police est de sortie en ville !'];try{if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(L[(Math.random()*L.length)|0]);u.lang='fr-FR';u.rate=1.15;u.pitch=1.15;if(RADIO.bus){RADIO.bus.gain.setTargetAtTime(.15,AC.currentTime,.2);u.onend=()=>{if(RADIO.bus&&RADIO.st)RADIO.bus.gain.setTargetAtTime(.5,AC.currentTime,.4)}}speechSynthesis.speak(u)}}catch(e){}}
+let DJT=40;function radioDJ(){DJT-=.04;if(DJT>0||state!=='game'||muted)return;DJT=70+Math.random()*50;const S=RADIO_ST[RADIO.st],L=['Vous écoutez Radio SMASHR '+S.name.toLowerCase()+' ! Restez prudents sur la route… ou pas !','Radio Tôle, '+S.name.toLowerCase()+' ! On continue avec du bon son.','Ici Radio Tôle. Attention, la police est de sortie en ville !'];try{if(window.speechSynthesis){const u=new SpeechSynthesisUtterance(L[(Math.random()*L.length)|0]);u.lang='fr-FR';u.rate=1.15;u.pitch=1.15;if(RADIO.bus){RADIO.bus.gain.setTargetAtTime(.15,AC.currentTime,.2);u.onend=()=>{if(RADIO.bus&&RADIO.st)RADIO.bus.gain.setTargetAtTime(.5,AC.currentTime,.4)}}speechSynthesis.speak(u)}}catch(e){}}
 function radioSet(st){RADIO.st=st;store.set('tf_radio',st);$('#hRadio').textContent='RADIO : '+(RADIO_ST[st]?RADIO_ST[st].name:'OFF');
   if(!AC)return;if(!RADIO.bus){RADIO.bus=AC.createGain();RADIO.bus.connect(master)}RADIO.bus.gain.value=st?.5:0;RADIO.next=AC.currentTime+.05;if(!RADIO.timer)RADIO.timer=setInterval(radioTick,40)}
 const QUALS=['BASSE','MOYENNE','HAUTE'];let QUAL=store.get('tf_q2')==null?(coarseDev?0:2):+store.get('tf_q2');
@@ -3256,8 +3257,8 @@ function evHTML(){const row=(n,d,k)=>`<div class="race"><b>${n}</b><small>${d}</
 function takePhoto(){if(!showCar)return;const W=canvas.width,H=canvas.height;showCam.clearViewOffset();showCam.aspect=W/H;showCam.fov*=.72;showCam.updateProjectionMatrix();renderer.render(show,showCam);
   const c2=document.createElement('canvas');c2.width=W;c2.height=H;const g=c2.getContext('2d');g.drawImage(canvas,0,0);const k=H/400;
   g.fillStyle='rgba(0,0,0,.45)';g.fillRect(0,H-46*k,W,46*k);g.fillStyle='#fff';g.font=`700 ${20*k}px 'Chakra Petch',Arial,sans-serif`;g.textBaseline='middle';g.fillText((selected.brand+' '+selected.name).toUpperCase(),16*k,H-23*k);
-  g.fillStyle='#ff5b1f';g.textAlign='right';g.font=`700 ${14*k}px 'Chakra Petch',Arial,sans-serif`;g.fillText('TÔLE FROISSÉE',W-16*k,H-23*k);
-  const url=c2.toDataURL('image/jpeg',.92);resize();const el=$('#photo');el.querySelector('img').src=url;const a=$('#phDl');a.href=url;a.download='tole-froissee-'+selected.id+'.jpg';el.hidden=false;if(AC)SFX.latch()}
+  g.fillStyle='#ff5b1f';g.textAlign='right';g.font=`700 ${14*k}px 'Chakra Petch',Arial,sans-serif`;g.fillText('SMASHR',W-16*k,H-23*k);
+  const url=c2.toDataURL('image/jpeg',.92);resize();const el=$('#photo');el.querySelector('img').src=url;const a=$('#phDl');a.href=url;a.download='smashr-'+selected.id+'.jpg';el.hidden=false;if(AC)SFX.latch()}
 // ---- classement de la semaine (toi + les joueurs croisés en ligne)
 const WEEK=Math.floor((Date.now()/864e5+3)/7);let WK={w:WEEK,best:0,peers:{}};
 try{const o=JSON.parse(store.get('tf_week')||'{}');if(o&&o.w===WEEK)WK=Object.assign(WK,o)}catch(e){}
@@ -3524,7 +3525,7 @@ function wevStart(){if(WEV.ev==='race1'){evClear();raceBegin(1,0)}else ({drift:d
 function wevBoard(){const me=+(store.get(WEV_KEY)||0),rows=[[(NET.nick||'Toi')+' (toi)',me,1],...Object.entries(WK.ev||{}).filter(([n])=>n!==NET.nick).map(([n,v])=>[n,v,0])].filter(r=>r[1]>0).sort((a,b)=>WEV.hi?b[1]-a[1]:a[1]-b[1]).slice(0,10);
   return `<div class="opt"><h4>${WEV.n.toUpperCase()} <b>entre amis</b></h4><div style="display:flex;flex-direction:column;gap:4px">${rows.length?rows.map((r,i)=>`<div class="pl"><i style="background:${r[2]?'var(--accent)':'#3ecf8e'}"></i><b>${i+1}. ${escH(String(r[0]).slice(0,22))}</b><span>${wevFmt(r[1])}</span></div>`).join(''):'<small>Personne n\'a encore joué ce défi.</small>'}</div></div>`}
 /* ---------- SPONSORS : contrats avec objectifs ---------- */
-const SPONS=[{n:'Tôle Oil',k:'flip',v:15,d:'Fais 15 tonneaux',p:3000},{n:'Gomme+',k:'km',v:10,d:'Roule 10 km',p:2500},{n:'Casse Auto Pro',k:'crash',v:25,d:'Fais 25 chocs',p:2500},{n:'Turbo Cola',k:'race',v:3,d:'Gagne 3 courses en ligne',p:5000},
+const SPONS=[{n:'Smashr Oil',k:'flip',v:15,d:'Fais 15 tonneaux',p:3000},{n:'Gomme+',k:'km',v:10,d:'Roule 10 km',p:2500},{n:'Casse Auto Pro',k:'crash',v:25,d:'Fais 25 chocs',p:2500},{n:'Turbo Cola',k:'race',v:3,d:'Gagne 3 courses en ligne',p:5000},
   {n:'Boum Assurances',k:'boom',v:5,d:'Fais exploser 5 voitures',p:2000},{n:'Ballon Motors',k:'goal',v:5,d:'Marque 5 buts au foot',p:4000},{n:'Radar Max',k:'vmax',v:230,d:'Atteins 230 km/h',p:3000,max:1},{n:'Vitesse Club',k:'km',v:25,d:'Roule 25 km',p:5000},{n:'Acro Sport',k:'flip',v:40,d:'Fais 40 tonneaux',p:6000}];
 let SPC=null;try{SPC=JSON.parse(store.get('tf_spon')||'null')}catch(e){}
 function sponOffers(){const r=mulberry32(Math.floor(Date.now()/864e5)*13+1),o=[];while(o.length<3){const i=(r()*SPONS.length)|0;if(!o.includes(i))o.push(i)}return o}
@@ -3783,8 +3784,8 @@ const PHOTOM={on:false,yaw:0,pitch:.35,dist:9,ptr:new Map(),pd:0};
 function photoStart(){if(state!=='game'||!player)return;Object.assign(PHOTOM,{on:true,yaw:player.a+Math.PI*.8,pitch:.3,dist:8});$('#phoBar').hidden=false;$('#hud').style.visibility='hidden';$('#ctl').hidden=true;$('#moreMenu').hidden=true;toast('MODE PHOTO : GLISSE POUR TOURNER, PINCE POUR ZOOMER')}
 function photoStop(){PHOTOM.on=false;$('#phoBar').hidden=true;$('#hud').style.visibility='';$('#ctl').hidden=!coarse}
 function photoFrame(){const p=player;camera.position.set(p.x+Math.sin(PHOTOM.yaw)*Math.cos(PHOTOM.pitch)*PHOTOM.dist,p.y+.8+Math.sin(PHOTOM.pitch)*PHOTOM.dist,p.z+Math.cos(PHOTOM.yaw)*Math.cos(PHOTOM.pitch)*PHOTOM.dist);camera.up.set(0,1,0);camera.lookAt(p.x,p.y+.7,p.z);sky.position.copy(camera.position);renderer.render(game,camera)}
-function photoTake(){photoFrame();const c2=document.createElement('canvas');c2.width=canvas.width;c2.height=canvas.height;const g=c2.getContext('2d');g.drawImage(canvas,0,0);const k=c2.height/400;g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,c2.height-40*k,c2.width,40*k);g.fillStyle='#ff5b1f';g.font=`700 ${15*k}px 'Chakra Petch',Arial`;g.textAlign='right';g.textBaseline='middle';g.fillText('TÔLE FROISSÉE',c2.width-14*k,c2.height-20*k);
-  const url=c2.toDataURL('image/jpeg',.92),el=$('#photo');el.querySelector('img').src=url;$('#phDl').href=url;$('#phDl').download='tole-froissee-photo.jpg';el.hidden=false;if(AC)SFX.latch()}
+function photoTake(){photoFrame();const c2=document.createElement('canvas');c2.width=canvas.width;c2.height=canvas.height;const g=c2.getContext('2d');g.drawImage(canvas,0,0);const k=c2.height/400;g.fillStyle='rgba(0,0,0,.4)';g.fillRect(0,c2.height-40*k,c2.width,40*k);g.fillStyle='#ff5b1f';g.font=`700 ${15*k}px 'Chakra Petch',Arial`;g.textAlign='right';g.textBaseline='middle';g.fillText('SMASHR',c2.width-14*k,c2.height-20*k);
+  const url=c2.toDataURL('image/jpeg',.92),el=$('#photo');el.querySelector('img').src=url;$('#phDl').href=url;$('#phDl').download='smashr-photo.jpg';el.hidden=false;if(AC)SFX.latch()}
 /* ---------- alarmes de voitures garées + radio aléatoire ---------- */
 const SHUF={on:store.get('tf_shuf')==='1',t:90};
 function alarmTick(dt){for(const c of cars){if(!(c.alarmT>0))continue;c.alarmT-=dt;c.haz=c.alarmT>0;if(AC&&!muted&&player&&Math.floor(c.alarmT*3)!==Math.floor((c.alarmT+dt)*3)){const d=Math.hypot(c.x-player.x,c.z-player.z);if(d<60)sfxO(AC.currentTime,.18,'square',Math.floor(c.alarmT*3)%2?880:660,.07*(1-d/60))}}
@@ -3976,7 +3977,7 @@ function pizBox(){const g=new THREE.Group(),m=new THREE.Mesh(new THREE.BoxGeomet
   const t=new THREE.Mesh(new THREE.PlaneGeometry(.88,.88),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));t.material.userData.lin=1;t.rotation.x=-Math.PI/2;t.position.y=.065;g.add(t);return g}
 function pizStart(){evClear();if(MAP!=='city'){toast('LIVRAISON : EN VILLE SEULEMENT');return}Object.assign(PIZ,{on:true,t:240,cash:0,n:0,load:[]});player.repair();POLICE.heat=0;
   PIZ.shop=taxiSpot(player.x,player.z,40,140);if(!PIZ.sm){PIZ.sm=ringMesh();PIZ.sm.userData.ring.material.color.set('#ff5b1f');PIZ.sm.children[1].material.color.set('#ff5b1f');const b=pizBox();b.scale.setScalar(2);b.position.y=1.2;PIZ.sm.add(b);game.add(PIZ.sm)}
-  PIZ.sm.visible=true;PIZ.sm.position.set(PIZ.shop[0],0,PIZ.shop[1]);$('#misChip').hidden=false;toast('🍕 VA À LA PIZZERIA (CHEMIN ORANGE) !');setTimeout(()=>radio('Pizzeria Tôle Froissée ! Trois commandes t\'attendent.',true),500)}
+  PIZ.sm.visible=true;PIZ.sm.position.set(PIZ.shop[0],0,PIZ.shop[1]);$('#misChip').hidden=false;toast('🍕 VA À LA PIZZERIA (CHEMIN ORANGE) !');setTimeout(()=>radio('Pizzeria SMASHR ! Trois commandes t\'attendent.',true),500)}
 function pizNav(){const p=player;if(!PIZ.load.length)return[PIZ.shop[0],PIZ.shop[1],'#ff5b1f'];let b=null,bd=1e9;for(const o of PIZ.load){const d=Math.hypot(o.x-p.x,o.z-p.z);if(d<bd){bd=d;b=o}}return[b.x,b.z,'#3ecf8e']}
 function pizTick(dt){if(!PIZ.on)return;const p=player;PIZ.t-=dt;if(PIZ.sm)PIZ.sm.userData.ring.rotation.z+=dt;
   if(!PIZ.load.length){if(Math.hypot(p.x-PIZ.shop[0],p.z-PIZ.shop[1])<6&&Math.abs(p.vF)<2.5&&!p.dead){PIZ.dmg0=p.damage;
@@ -4060,7 +4061,7 @@ function ktBuild(){if(KT.built||MAP!=='city')return;KT.built=true;ktPath();const
   const s0=E(0,0),a0=Math.atan2(P[2][0]-P[0][0],P[2][1]-P[0][1]),cv=document.createElement('canvas');cv.width=128;cv.height=16;const x=cv.getContext('2d');for(let i=0;i<16;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?'#111':'#fff';x.fillRect(i*8,j*8,8,8)}
   const ln=new THREE.Mesh(new THREE.PlaneGeometry(w,1.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(cv)}));ln.material.userData.lin=1;ln.rotation.set(-Math.PI/2,0,a0+Math.PI/2);ln.position.set(s0[0],y+.02,s0[1]);game.add(ln);
   const gg=new THREE.Group(),bm=new THREE.MeshLambertMaterial({color:'#e8e8e2'});for(const sg of[-1,1]){const pl=new THREE.Mesh(new THREE.BoxGeometry(.4,5.2,.4),bm);pl.position.set(sg*(w/2+1),2.6,0);gg.add(pl)}
-  const c2=document.createElement('canvas');c2.width=512;c2.height=64;const x2=c2.getContext('2d');x2.fillStyle='#ff5b1f';x2.fillRect(0,0,512,64);x2.fillStyle='#fff';x2.font='bold 40px sans-serif';x2.textAlign='center';x2.fillText('KARTING TÔLE FROISSÉE',256,46);
+  const c2=document.createElement('canvas');c2.width=512;c2.height=64;const x2=c2.getContext('2d');x2.fillStyle='#ff5b1f';x2.fillRect(0,0,512,64);x2.fillStyle='#fff';x2.font='bold 40px sans-serif';x2.textAlign='center';x2.fillText('KARTING SMASHR',256,46);
   const bn=new THREE.Mesh(new THREE.BoxGeometry(w+2.4,1.2,.2),[bm,bm,bm,bm,new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c2)}),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c2)})]);bn.material[4].userData.lin=1;bn.material[5].userData.lin=1;bn.position.y=5.6;gg.add(bn);
   gg.position.set(s0[0],0,s0[1]);gg.rotation.y=a0;linearize(gg);game.add(gg);
   const nr=ktNorm(0),gs=new THREE.Group();for(let k=0;k<4;k++){const st=new THREE.Mesh(new THREE.BoxGeometry(3,1+k*.9,26),new THREE.MeshLambertMaterial({color:k%2?'#9aa3aa':'#c41b1b'}));st.position.set(-k*3,(1+k*.9)/2,0);gs.add(st)}
