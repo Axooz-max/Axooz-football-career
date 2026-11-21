@@ -2800,12 +2800,40 @@ function jackMesh(){const g=new THREE.Group(),base=new THREE.Mesh(new THREE.BoxG
   const post=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,1,10),wM('#d9dce0',{shininess:140})),pad=new THREE.Mesh(new THREE.BoxGeometry(.22,.04,.22),wM('#2a2c30'));g.add(base,post,pad);g.userData={post,pad};return g}
 function upgCalipers(car){if(!car)return;for(const w of car.wheels){if(w.cal){w.pv.remove(w.cal);w.cal=null}
     if(UPG.brakes>0){const r=car.sp.wr,col=LV_COL[UPG.brakes],m=new THREE.Mesh(new THREE.BoxGeometry(.1,r*.34,r*.26),wM(col,{emissive:col,emissiveIntensity:.15}));m.position.set(0,r*.3,-r*.2);linearize(m);w.pv.add(m);w.cal=m}}}
+
+/* ---------- bruitages d'atelier (synthétisés) ---------- */
+function sfxN(t,d,ft,fq,q,gn,fq2){const s=AC.createBufferSource();s.buffer=noiseBuf;s.loop=true;const f=AC.createBiquadFilter();f.type=ft;f.frequency.setValueAtTime(fq,t);if(fq2)f.frequency.exponentialRampToValueAtTime(fq2,t+d);f.Q.value=q;
+  const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gn,t+.005);g.gain.exponentialRampToValueAtTime(.0005,t+d);s.connect(f);f.connect(g);g.connect(master);s.start(t,Math.random()*.5);s.stop(t+d+.02)}
+function sfxO(t,d,ty,fq,gn,fq2){const o=AC.createOscillator();o.type=ty;o.frequency.setValueAtTime(fq,t);if(fq2)o.frequency.exponentialRampToValueAtTime(fq2,t+d);const g=AC.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(gn,t+.005);g.gain.exponentialRampToValueAtTime(.0005,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
+const SFX={
+  gun(){const t=AC.currentTime;sfxN(t,.08,'highpass',3000,.7,.15);for(let i=0;i<15;i++)sfxN(t+.05+i*.025,.02,'bandpass',2500+Math.random()*900,3,.38);sfxO(t+.04,.4,'sawtooth',1050,.06,1550);sfxN(t+.44,.16,'highpass',4200,.7,.09)},
+  jackUp(){const t=AC.currentTime;sfxN(t,.5,'highpass',2500,.7,.13,5000);sfxO(t,.45,'sawtooth',85,.08,140);sfxN(t+.46,.06,'lowpass',600,1,.32)},
+  jackDown(){const t=AC.currentTime;sfxN(t,.42,'highpass',3600,.7,.15,1700)},
+  thud(g=.4){const t=AC.currentTime;sfxO(t,.25,'sine',110,g,45);sfxN(t,.1,'lowpass',500,1,g*.6)},
+  clank(g=.3){const t=AC.currentTime;sfxN(t,.06,'bandpass',1800,2,g);for(const f of [620,1340,2230])sfxO(t,.5,'sine',f,g*.25);sfxO(t,.15,'sine',140,g*.6,70)},
+  latch(){const t=AC.currentTime;sfxN(t,.03,'bandpass',3000,4,.32);sfxN(t+.05,.03,'bandpass',2200,4,.22)},
+  creak(){const t=AC.currentTime,o=AC.createOscillator(),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o.frequency.setValueAtTime(70,t);o.frequency.linearRampToValueAtTime(115,t+.5);f.type='bandpass';f.frequency.value=900;f.Q.value=6;
+    g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.2,t+.05);g.gain.exponentialRampToValueAtTime(.001,t+.55);o.connect(f);f.connect(g);g.connect(master);o.start(t);o.stop(t+.6)},
+  ratchet(n=10){const t=AC.currentTime;for(let i=0;i<n;i++)sfxN(t+i*.05,.025,'bandpass',3800,5,.24)},
+  chain(d=.7){const t=AC.currentTime;for(let x=0;x<d;x+=.03+Math.random()*.04)sfxN(t+x,.03,'bandpass',4500+Math.random()*2000,6,.06+Math.random()*.07);sfxO(t,d,'square',55,.025,62)},
+  weld(d=1.2){const t=AC.currentTime;sfxN(t,d,'highpass',2500,.7,.05);for(let x=0;x<d;x+=.01+Math.random()*.03)sfxN(t+x,.012,'highpass',3000,1,.08+Math.random()*.15)},
+  hiss(d=.5){const t=AC.currentTime;sfxN(t,d,'highpass',5000,.7,.13)},
+  roll(){const t=AC.currentTime;for(let i=0;i<4;i++)sfxO(t+i*.09,.08,'sine',80,.2,50);sfxN(t,.4,'lowpass',300,1,.12)},
+  boing(){const t=AC.currentTime,o=AC.createOscillator(),l=AC.createOscillator(),lg=AC.createGain(),g=AC.createGain();o.type='triangle';o.frequency.value=220;l.frequency.value=14;lg.gain.value=60;l.connect(lg);lg.connect(o.frequency);
+    g.gain.setValueAtTime(.22,t);g.gain.exponentialRampToValueAtTime(.001,t+.6);o.connect(g);g.connect(master);o.start(t);l.start(t);o.stop(t+.62);l.stop(t+.62)},
+  clink(){const t=AC.currentTime;for(const f of [2100,3150,4400])sfxO(t,.6,'sine',f,.07);sfxO(t+.12,.5,'sine',2350,.05)},
+  slam(){SFX.thud(.5);SFX.latch()}};
+function workEvents(fam,k){const S=SFX;
+  if(fam==='engine'||fam==='nitro'){const e=[[.4,S.latch],[.45,S.creak],[1,()=>S.ratchet(8)],[1.15,()=>S.chain(.7)],[2.1,()=>S.chain(.5)],[2.6,()=>S.ratchet(10)],[3.2,()=>S.clank(.35)],[3.25,()=>S.thud(.3)],[3.4,S.creak],[4,S.slam]];
+    if(fam==='nitro')e.push([2.55,S.clink],[3.3,()=>S.hiss(.4)]);return e}
+  if(fam==='wheels')return [[.4,S.jackUp],[1,S.gun],[1.5,k==='grip'?S.roll:()=>S.clank(.25)],[2,k==='grip'?S.roll:k==='susp'?S.boing:()=>S.clank(.3)],[2.4,()=>S.clank(.2)],[2.6,S.gun],[3.2,S.jackDown],[3.6,()=>S.thud(.35)]];
+  return [[.5,()=>S.hiss(.3)],[1.2,()=>S.clank(.45)],[1.25,()=>S.weld(1.2)],[2.55,()=>S.ratchet(6)]]}
 function workClear(){const c=WORK.car;for(const o of WORK.objs)if(o.parent)o.parent.remove(o);WORK.objs=[];
   for(const m of WORK.mats){m.clippingPlanes=null;m.clipIntersection=false;m.needsUpdate=true}WORK.mats=[];
   if(c){for(const w of c.wheels){w.m.position.x=0;w.m.visible=true;if(w.pv.children[1])w.pv.children[1].visible=true;if(w.cal)w.cal.visible=true}if(WORK.k==='brakes')upgCalipers(c)}
   if(WORK.on&&!WORK.fxDone)buyLabel(WORK.label,WORK.price);WORK.on=false;WORK.planes=null;WORK.car=null}
 function workStart(k,label,price){const c=showCar;workClear();const fam=UPG_FAM[k]||'body',lv=UPG[k],old=Math.max(0,lv-1),sp=c.sp;
-  Object.assign(WORK,{on:true,k,fam,t:0,car:c,label,price,lv,old,fxDone:false,thud:0,planes:null,oldP:null,newP:null});showIdle=0;
+  Object.assign(WORK,{on:true,k,fam,t:0,car:c,label,price,lv,old,fxDone:false,thud:0,planes:null,oldP:null,newP:null,ev:workEvents(fam,k)});showIdle=0;
   const add=(o,par)=>{(par||c.body).add(o);WORK.objs.push(o);linearize(o);return o};
   if(fam==='engine'||fam==='nitro'){const front=fam==='engine',I=lidInfo(c,front);WORK.I=I;WORK.dur=4.4;WORK.lp=lidPlanes(I);WORK.planes=WORK.lp.map(q=>q.clone());
     for(const m of new Set([c.crisp.mesh.material,c.detMesh.material,...c.plates.map(q=>q.m.material)])){m.clippingPlanes=WORK.planes;m.clipIntersection=true;m.needsUpdate=true;WORK.mats.push(m)}
@@ -2828,12 +2856,12 @@ function workStart(k,label,price){const c=showCar;workClear();const fam=UPG_FAM[
   else{WORK.dur=3.7;WORK.yaw=WORK_YAW.body;const S=c.S,yb=(S.bottom(.5)+sp.belt)/2,hg=(sp.belt-S.bottom(.5))*.55;WORK.plates=[];
     for(const sg of [-1,1]){const m=new THREE.Mesh(new THREE.BoxGeometry(.03,hg,sp.wb*.62),wM(lv>=4?'#e8b923':'#9aa0a8',{shininess:140,transparent:true}));m.userData={sg,x:sg*(S.hwBase(.5,.45)+.025),y:yb};add(m);WORK.plates.push(m)}
     WORK.look.set(0,0,0)}}
-function workInstall(v){WORK.fxDone=true;fxShow.fire(v.x,v.y,v.z,10,.25,1.1);fxShow.smoke(v.x,v.y,v.z,5,.3);crashSound(.3);buyLabel(WORK.label,WORK.price)}
+function workInstall(v){WORK.fxDone=true;fxShow.fire(v.x,v.y,v.z,10,.25,1.1);fxShow.smoke(v.x,v.y,v.z,5,.3);buyLabel(WORK.label,WORK.price)}
 function workTick(dt){const c=showCar;WORK.z+=clamp((WORK.on?1:0)-WORK.z,-dt*1.6,dt*1.6);
   {const a=showYaw,l=WORK.look;WORK.lookW.set(l.x*Math.cos(a)+l.z*Math.sin(a),0,-l.x*Math.sin(a)+l.z*Math.cos(a))}
   if(!WORK.on){if(WORK.aimT>0&&WORK.aim!=null){WORK.aimT-=dt;showIdle=0;showYaw+=wAng(WORK.aim,showYaw)*Math.min(1,dt*3)}return}
   if(!c||c!==WORK.car){workClear();return}
-  WORK.t+=dt;const t=WORK.t,sp=c.sp,seg=(a,b)=>smooth01(clamp((t-a)/(b-a),0,1));showIdle=0;showYaw+=wAng(WORK.yaw,showYaw)*Math.min(1,dt*3);
+  WORK.t+=dt;for(const e of WORK.ev)if(!e[2]&&WORK.t>=e[0]){e[2]=1;if(AC)try{e[1]()}catch(_){}}const t=WORK.t,sp=c.sp,seg=(a,b)=>smooth01(clamp((t-a)/(b-a),0,1));showIdle=0;showYaw+=wAng(WORK.yaw,showYaw)*Math.min(1,dt*3);
   c.group.updateMatrixWorld(true);const wp=v=>v.applyMatrix4(c.body.matrixWorld);
   if(WORK.planes)for(let i=0;i<WORK.planes.length;i++)WORK.planes[i].copy(WORK.lp[i]).applyMatrix4(c.body.matrixWorld);
   const O=WORK.oldP,N=WORK.newP;
@@ -2844,7 +2872,7 @@ function workTick(dt){const c=showCar;WORK.z+=clamp((WORK.on?1:0)-WORK.z,-dt*1.6
     WORK.asm.traverse(o=>{if(o.userData.spin)o.userData.spin.rotation.z+=dt*14});
     if(t>2.1&&t<2.6&&Math.random()<dt*25){const v=wp(new THREE.Vector3(0,WORK.I.ymax+.9,WORK.look.z));fxShow.fire(v.x,v.y,v.z,1,.3,.4)}
     if(t>=3.2&&!WORK.fxDone)workInstall(wp(new THREE.Vector3(0,WORK.I.ymin,WORK.look.z)));
-    if(t>=4&&!WORK.thud){WORK.thud=1;crashSound(.22)}}
+    }
   else if(WORK.fam==='wheels'){const w=WORK.w,sg=w.sg,lift=seg(.4,.9)*(1-seg(3.2,3.6))*.3;c.group.position.y=lift;
     const J=WORK.jack,jh=Math.max(.05,sp.clr+lift-.14);J.position.y=-lift;J.userData.post.scale.y=jh;J.userData.post.position.y=jh/2+.08;J.userData.pad.position.y=jh+.1;
     const out=seg(1,1.45)*(1-seg(2.6,3.05));
@@ -2853,7 +2881,7 @@ function workTick(dt){const c=showCar;WORK.z+=clamp((WORK.on?1:0)-WORK.z,-dt*1.6
     else{w.m.position.x=sg*out*.95;w.m.rotation.x+=dt*out*2;const a=seg(1.5,1.9),b=seg(1.9,2.4),B=WORK.base;
       O.visible=a<1;O.position.set(B.x+sg*a*.9,B.y-a*.3,B.z);O.rotation.x=a*2;N.visible=t>1.9;N.position.set(B.x+sg*(1-b)*.9,B.y+(1-b)*.5,B.z);N.rotation.x=(b-1)*2}
     if(t>=2.4&&!WORK.fxDone){const v=new THREE.Vector3();w.pv.getWorldPosition(v);workInstall(v)}
-    if(t>=3.6){if(!WORK.thud){WORK.thud=1;crashSound(.2)}c.group.position.y=Math.sin((t-3.6)*18)*.03*Math.max(0,1-(t-3.6)*2.5)}}
+    if(t>=3.6){c.group.position.y=Math.sin((t-3.6)*18)*.03*Math.max(0,1-(t-3.6)*2.5)}}
   else{const f=seg(.5,1.2),fade=seg(2.6,3.4);for(const m of WORK.plates){const u=m.userData;m.position.set(u.x+u.sg*(1-f)*2.2,u.y+(1-f)*1.6,0);m.rotation.set(0,(1-f)*2,u.sg*(1-f)*1.5);m.material.opacity=1-fade;m.visible=fade<1}
     if(t>1.2&&t<2.5&&Math.random()<dt*22){const m=WORK.plates[Math.random()<.5?0:1],v=wp(new THREE.Vector3(m.userData.x,m.userData.y+(Math.random()-.5)*.25,(Math.random()-.5)*sp.wb*.6));fxShow.fire(v.x,v.y,v.z,1,.05,.5)}
     if(t>=1.2&&!WORK.fxDone)workInstall(wp(new THREE.Vector3(WORK.plates[1].userData.x,WORK.plates[1].userData.y,0)))}
