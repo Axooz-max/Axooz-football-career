@@ -279,6 +279,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 #flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:28}#flash.go{animation:fl .5s ease-out}@keyframes fl{0%{opacity:.75}100%{opacity:0}}
 .tools .ico{min-width:0;padding-left:9px;padding-right:9px}.tools .ico.on{background:#e8a21f;color:#160800}
 #cNum,#cSpon{width:100%;max-width:300px;box-sizing:border-box;font:700 18px var(--display);letter-spacing:.1em;text-transform:uppercase;padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--panel2);color:#fff;margin-bottom:6px}
+#guide{position:fixed;inset:0;z-index:67;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:12px}#guide[hidden]{display:none}#guide .gbox{width:min(560px,94vw);max-height:88vh;overflow-y:auto;background:#15161a;border:1px solid var(--line);border-radius:14px;padding:14px 18px;zoom:var(--uk,1)}#guide h3{margin:0 0 6px;color:var(--accent2);letter-spacing:.15em}#guide h4{margin:10px 0 2px;font-size:13px;color:#fff}#guide ul{margin:0;padding-left:18px;color:#ccc;font-size:12px;line-height:1.5}#guide .pbtn{display:block;margin:12px auto 0}
 #tuto{position:fixed;inset:0;z-index:66;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}#tuto[hidden]{display:none}
 #tuto .tbox{width:min(340px,92vw);background:#15161a;border:1px solid var(--line);border-radius:14px;padding:16px 18px;text-align:center;zoom:var(--uk,1)}#tuto .ti{font-size:40px;animation:tb 1s ease-in-out infinite}@keyframes tb{50%{transform:translateY(-6px) scale(1.08)}}
 #tuto h3{margin:6px 0 4px;color:var(--accent2);letter-spacing:.1em}#tuto p{margin:0 0 10px;color:#ddd;font-size:13px;line-height:1.4}#tuto .dots{display:flex;gap:5px;justify-content:center;margin-bottom:10px}#tuto .dots i{width:7px;height:7px;border-radius:50%;background:#444}#tuto .dots i.on{background:var(--accent)}
@@ -364,7 +365,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
   </div><button id="pickOk">C'EST PARTI</button></div></div>
 <div id="replayBar" hidden><b>RALENTI</b><div class="bar"><i></i></div><button id="replayStop">QUITTER</button></div>
 <div id="buyfx" hidden><span>ACHETÉ !</span><b></b><small></small></div><div id="coins"></div>
-<div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
+<div id="toast"></div><div id="f1l" hidden><i></i><i></i><i></i><i></i><i></i></div><div id="radioMsg" hidden></div><div id="drift" hidden></div><div id="tuto" hidden></div><div id="guide" hidden></div><div id="flash"></div><div id="rmirror" hidden></div><div id="dash" hidden><div class="g"><i id="dRpm"></i><small>TR/MIN</small></div><svg id="dWheel" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1a1b1e" stroke-width="10"/><path d="M8 50h28M64 50h28M50 58v34" stroke="#1a1b1e" stroke-width="9"/><circle cx="50" cy="50" r="12" fill="#2a2c30"/><rect x="46" y="4" width="8" height="10" fill="#e33"/></svg><div class="g"><i id="dSpd"></i><b id="dKmh">0</b><em id="dGear">1</em></div></div><div id="photo" hidden><img alt="Photo de ta voiture"><p>Appuie longtemps sur la photo pour l'enregistrer</p><div><a class="pbtn" id="phDl">TÉLÉCHARGER</a><button class="pbtn" id="phClose">FERMER</button></div></div><div id="podium" hidden><h3>CLASSEMENT FINAL</h3><ol></ol><button class="pbtn" id="podClose">OK</button></div>
 <div id="dead" hidden><b>VOITURE DÉTRUITE</b><p id="dTxt">Nouvelle voiture dans 5 s</p><button id="dRepair">REPARTIR MAINTENANT</button></div>
 <div id="loading">CHARGEMENT…</div>
 
@@ -788,6 +789,11 @@ function buildDetailGeo(sp,S){
     add(new THREE.BoxGeometry(2*hwF+.1,.1,.13,16,1,1),bc,0,byF,zF(byF)+.035);
     add(new THREE.BoxGeometry(2*hwR+.1,.1,.13,16,1,1),bc,0,byR,zR(byR)-.035);
     add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,hwF+.03,byF,zF(byF)-.2);add(new THREE.BoxGeometry(.12,.1,.5,1,1,6),bc,-hwF-.03,byF,zF(byF)-.2);}
+  if(sp.bumper==='body'&&!sp.truck&&!sp.monster&&!sp.npc){const dk='#121315',yr=sp.year||1990,sport=sp.hp>=180;
+    front(rr(2*hwF*(sport?.78:.62),hF*(sport?.2:.14),.04),dk,0,b0+hF*.14,.007);
+    if(yr>=1995)for(const sg of [-1,1])front(rr(hwF*.24,hF*.16,.03),dk,sg*hwF*.74,b0+hF*.16,.007);
+    front(P(2*hwF*.9,.018),'#2a2c30',0,b0+.012,.01);
+    rear(rr(2*hwR*.72,hR*.13,.03),dk,0,b1+hR*.09,.007);if(sport)for(const sg of [-1,1])for(let k=0;k<3;k++)rear(P(.02,hR*.12),'#3a3c40',sg*(.12+k*.14),b1+hR*.09,.009)}
   const plateZ=sp.bumper!=='body'?.105:.008,yPF=sp.bumper!=='body'?byF:b0+hF*.22,ryP=b1+hR*.44;
   const plates=[xf(0,yPF,zF(yPF)+plateZ,tiltF,0,'XYZ'),xf(0,ryP,zR(ryP)-.009,tiltR,Math.PI,'YXZ')];
   front(P(.54,.125),'#1a1b1d',0,yPF,plateZ-.002);rear(P(.54,.125),'#1a1b1d',0,ryP,.006);
@@ -1970,7 +1976,7 @@ function dirtTick(dt,p){const cr=p.crisp,sp=Math.abs(p.vF);let add=0;if(sp>3){if
   if(add){cr.dirt=Math.min(1,(cr.dirt||0)+add*dt);if(Math.abs(cr.dirt-(cr.dirtR||0))>.04){cr.dirtR=cr.dirt;cr.rebuild()}}}
 function statTick(dt,p){if(statT>4.9)sponTick();STATS.time+=dt;STATS.km+=Math.abs(p.vF)*dt/1000;STATS.vmax=Math.max(STATS.vmax,Math.abs(p.vF)*3.6);statT+=dt;if(statT>5){statT=0;statSave()}}
 function renderProf(){const el=$('#prof');const l=lvlOf(STATS.xp),a=xpFor(l),b=xpFor(l+1),h=Math.floor(STATS.time/3600),m=Math.floor(STATS.time/60)%60;
-  el.innerHTML=`<div class="opt"><h4>${escH(NET.nick||'PILOTE')} <b>${titleOf(l)}</b></h4><div class="lvl"><b>${l}</b><div><small style="color:var(--mute);font-size:11px">NIVEAU · ${Math.round(STATS.xp-a).toLocaleString('fr-FR')} / ${(b-a).toLocaleString('fr-FR')} XP</small><div class="xp"><i style="width:${Math.min(100,(STATS.xp-a)/(b-a)*100)}%"></i></div></div></div></div>
+  el.innerHTML=`<button class="btn2" id="gOpen" style="width:100%">📖 GUIDE DU JEU</button><div class="opt"><h4>${escH(NET.nick||'PILOTE')} <b>${titleOf(l)}</b></h4><div class="lvl"><b>${l}</b><div><small style="color:var(--mute);font-size:11px">NIVEAU · ${Math.round(STATS.xp-a).toLocaleString('fr-FR')} / ${(b-a).toLocaleString('fr-FR')} XP</small><div class="xp"><i style="width:${Math.min(100,(STATS.xp-a)/(b-a)*100)}%"></i></div></div></div></div>
   <div class="pst">${[['KM PARCOURUS',STATS.km.toFixed(1).replace('.',',')],['TEMPS DE JEU',h+' h '+m+' min'],['CHOCS',STATS.crash],['EXPLOSIONS',STATS.boom],['TONNEAUX',STATS.flip],['VITESSE MAX',Math.round(STATS.vmax)+' km/h'],['COURSES GAGNÉES',STATS.race],['BUTS',STATS.goal],['RECORD DE SCORE',SC.best.toLocaleString('fr-FR')],['ARGENT',BANK.cash.toLocaleString('fr-FR')+' €']].map(([k,v])=>`<div><small>${k}</small><b>${v}</b></div>`).join('')}</div>
   <div class="opt"><h4>TITRES</h4><div class="titles">${TITLES.map(([n,t])=>`<span class="${l>=n?'on':''}">${t} · niv. ${n}</span>`).join('')}</div></div>`+sponHTML()+collHTML()+saveHTML()}
 const SC={score:0,best:+(store.get('tf_best')||0),combo:1,lastT:-9};
@@ -2534,7 +2540,7 @@ const POLICE={heat:0,stars:0,maxStars:0,calm:99,list:[],spawnT:0};
 let POLICE_SPEC=null;
 function policeSpec(){if(POLICE_SPEC)return POLICE_SPEC;const b=CARS.find(c=>c.id.includes('megane'))||CARS[0];
   return POLICE_SPEC=Object.assign({},b,{color:'#f2f3f1',color2:null,stripe:'#1f4bb8',rim:'#2a2c30',police:1,plate:'POLICE',name:'Police',brand:'Police',tint:1,wing:0})}
-function wantedAdd(v){if(!player||player.dead)return;POLICE.heat=Math.min(5.5,POLICE.heat+v);POLICE.calm=0}
+function wantedAdd(v){if(!player||player.dead||DERBY.on||PARK.on)return;POLICE.heat=Math.min(5.5,POLICE.heat+v);POLICE.calm=0}
 function spawnPolice(){const p=player;for(let i=0;i<40;i++){const r=ROADS[(Math.random()*ROADS.length)|0],t=(Math.random()*2-1)*(HALF-30),vert=Math.random()<.5,lane=(Math.random()<.5?-4:4);
     const x=vert?r+lane:t,z=vert?t:r+lane,d=Math.hypot(x-p.x,z-p.z);if(d<85||d>170||cars.some(c=>Math.hypot(c.x-x,c.z-z)<8))continue;
     const c=new Car(policeSpec());c.setPose(x,z,Math.atan2(p.x-x,p.z-z));c.cop={stuck:0,rev:0};cars.push(c);game.add(c.group);POLICE.list.push(c);return}}
@@ -3471,6 +3477,15 @@ function trlStop(){TRL.on=false;if(TRL.g)TRL.g.visible=false;if(TRL.mark)TRL.mar
 const SPEC={i:0};
 function specActive(){return !!(MODE.def&&(MODE.def.m==='dem'||MODE.def.m==='tdm')&&MODE.lives<=0&&player&&player.dead&&NET.ghosts.size)}
 function specCar(){const l=[...NET.ghosts.values()].filter(g=>!g.car.dead);return l.length?l[SPEC.i%l.length]:null}
+
+/* ---------- GUIDE DU JEU ---------- */
+const GUIDE=[['🚗 Conduire',['GAZ / FREIN à droite, gauche-droite ou volant à gauche (au clavier : flèches ou ZQSD).','NITRO quand la jauge est pleine, FREIN À MAIN pour déraper, KLAXON.','En l\'air : gauche-droite pour les tonneaux, gaz-frein pour les saltos.','CAMÉRA : 6 vues (derrière, loin, capot, dessus, intérieur avec rétroviseur, cinéma).','⚠ warnings (touche F) et 💡 appel de phares (touche L) en haut de l\'écran.']],
+  ['🏠 Garage',['VOITURES : achète des voitures, ou des occasions pas chères dans ATELIER.','STYLE : couleur, finition, kit, aileron, numéro, sponsor, autocollant, son du moteur, klaxon, plaque.','ATELIER : améliorations avec montage animé, réglages (carrossage, pression, hauteur), réparations.','PROFIL : niveau, sponsors, collection, badges, sauvegarde par code.','PHOTO : une belle photo de ta voiture.']],
+  ['🏁 Modes (ATELIER, carte Ville)',['Histoire en 10 chapitres, missions, derby, courses contre la montre (avec ton fantôme).','Championnat, cascades, poursuite police, survie, taxi, remorque, dérapage, créneau.','Défi de la semaine : change chaque lundi.']],
+  ['🗺️ Autres cartes',['Désert : rallye avec copilote, tempêtes de sable.','Circuit : arrêt au stand, endurance de nuit (10 tours).','Montagne : glace, lacets, rallye, téléphérique.','Lune : gravité faible, sauts géants.']],
+  ['👥 Multijoueur (MULTI)',['En ligne ou en groupe avec un code.','Modes : démolition, équipes, chat, police, course, foot, roi, tournoi en 4 manches.','Mises sur les courses, chat avec émojis, VOIR la voiture des autres, classements de la semaine.']],
+  ['💡 Astuces',['Le chemin violet de la mini-carte te guide (et le GPS parle si la radio est activée).','Stations bleues : essence, pneus, lavage, réparation.','Radars de vitesse, feux rouges (étoile si la police te voit), caisse dorée avec tourelle.','Colosses : ils plient ta voiture en deux !']]];
+function guideShow(){const el=$('#guide');el.innerHTML=`<div class="gbox"><h3>GUIDE DU JEU</h3>${GUIDE.map(([t,l])=>`<h4>${t}</h4><ul>${l.map(x=>`<li>${x}</li>`).join('')}</ul>`).join('')}<button class="pbtn" id="gClose">FERMER</button></div>`;el.hidden=false;$('#gClose').onclick=()=>{el.hidden=true}}
 function rebuildShow(){if(showCar){show.remove(showCar.group)}showCar=new Car(specFor(selected));showCar.crisp.mesh.material=showMat(showCar.sp.fin);showCar.setPose(0,0,0);show.add(showCar.group);makeMirror();upgCalipers(showCar);updShowDmg()}
 let customs={};try{customs=JSON.parse(store.get('tf_custom')||'{}')||{}}catch(e){customs={}}
 const custOf=c=>customs[c.id]||(customs[c.id]={});
@@ -3573,6 +3588,7 @@ $('#hVib').onclick=()=>{VIB.on=!VIB.on;store.set('tf_vib',VIB.on?'1':'0');$('#hV
 $('#mPhoto').onclick=()=>takePhoto();$('#phClose').onclick=()=>{$('#photo').hidden=true};$('#podClose').onclick=()=>{$('#podium').hidden=true};
 $('#hTuto').onclick=()=>{$('#moreMenu').hidden=true;tutoShow()};$('#peekBack').onclick=()=>{$('#peek').hidden=true;selectCar(selected)};
 $('#prof').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const ta=$('#svTxt');
+  if(b.id==='gOpen'){guideShow();return}
   if(b.dataset.spon){const i=+b.dataset.spon,S=SPONS[i];SPC={i,b:S.max?0:STATS[S.k]};store.set('tf_spon',JSON.stringify(SPC));toast('CONTRAT SIGNÉ AVEC '+S.n.toUpperCase());renderProf();rebuildShow();return}
   if(b.id==='spQuit'){SPC=null;store.set('tf_spon','null');toast('CONTRAT ABANDONNÉ');renderProf();rebuildShow();return}
   if(b.id==='svMake'){try{const c=await saveCode();ta.value=c;ta.select();try{await navigator.clipboard.writeText(c);toast('CODE COPIÉ')}catch(_){toast('CODE CRÉÉ : COPIE-LE')}}catch(_){toast('IMPOSSIBLE DE CRÉER LE CODE')}}
@@ -3594,7 +3610,7 @@ $('#hSnd').onclick=()=>{muted=!muted;store.set('tf_mute',muted?'1':'0');setMuteU
 let toastT=0;function toast(t){const e=$('#toast');e.textContent=t;e.classList.toggle('long',t.length>22);e.style.opacity=1;toastT=t.length>22?2.8:1.1}
 
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
-function openMenu(){evClear();$('#radioMsg').hidden=true;$('#f1l').hidden=true;RACE.ln=0;$('#drift').hidden=true;if($('#towBtn'))$('#towBtn').hidden=true;if(TOW.car)towToggle();heliSound(false,0);state='menu';setTimeout(updNetChip,0);$('#qcBox').hidden=true;$('#board').hidden=true;$('#modeChip').hidden=true;if(MIS.on)misEnd(false);derbyEnd(true);turretStop();$('#speedfx').style.opacity=0;$('#bigmap').hidden=true;for(const g of NET.ghosts.values())if(g.el)g.el.hidden=true;if(RACE.on)raceEnd();rainSound(0);$('#chal').hidden=true;if(PSPOT)PSPOT.intensity=0;sirenSound(1e9);$('#mini').hidden=true;fxSounds(null,false);$('#ctlPick').hidden=true;$('#vig').hidden=true;$('#dead').hidden=true;$('#menu').hidden=false;$('#hud').hidden=true;$('#ctl').hidden=true;$('#kbd').hidden=true;if(eng)engineSound(null,0,false);resize()}
+function openMenu(){evClear();POLICE.heat=0;$('#radioMsg').hidden=true;$('#f1l').hidden=true;RACE.ln=0;$('#drift').hidden=true;if($('#towBtn'))$('#towBtn').hidden=true;if(TOW.car)towToggle();heliSound(false,0);state='menu';setTimeout(updNetChip,0);$('#qcBox').hidden=true;$('#board').hidden=true;$('#modeChip').hidden=true;if(MIS.on)misEnd(false);derbyEnd(true);turretStop();$('#speedfx').style.opacity=0;$('#bigmap').hidden=true;for(const g of NET.ghosts.values())if(g.el)g.el.hidden=true;if(RACE.on)raceEnd();rainSound(0);$('#chal').hidden=true;if(PSPOT)PSPOT.intensity=0;sirenSound(1e9);$('#mini').hidden=true;fxSounds(null,false);$('#ctlPick').hidden=true;$('#vig').hidden=true;$('#dead').hidden=true;$('#menu').hidden=false;$('#hud').hidden=true;$('#ctl').hidden=true;$('#kbd').hidden=true;if(eng)engineSound(null,0,false);resize()}
 function startGame(){if(WORK.on)workClear();
   if(!owned(selected)){toast('ACHÈTE CETTE VOITURE AU GARAGE');return}
   if(!isOpen(selected)){toast(GROUPS[groupOf(selected)].name+' VERROUILLÉS');return}
