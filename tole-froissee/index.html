@@ -329,7 +329,7 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 #mSpecs .rcls{color:#111;font-weight:800;border:0}
 .bbtns{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:0;right:0;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:0 12px;animation:fadein .5s 1.3s both}
 .bbtns button{background:#2a2c30;border:1px solid #3a3d42;color:#fff;border-radius:10px;padding:10px 14px;font-weight:800;letter-spacing:.08em;font-size:12px}.bbtns button.main{background:var(--accent);border-color:var(--accent);color:#160800}
-.btap{position:absolute;bottom:12%;width:100%;text-align:center;color:#ddd;letter-spacing:.3em;font-size:11px;animation:bpulse 1s infinite}#booster.smash .btap{display:none}
+.btap{position:absolute;bottom:12%;width:100%;text-align:center;color:#ddd;letter-spacing:.3em;font-size:11px;animation:bpulse 1s infinite}#booster.smash:not(.cards) .btap{display:none}
 .bshop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.bpk{border:0;border-radius:12px;padding:8px 6px 10px;background:linear-gradient(160deg,var(--c1),var(--c2));color:#fff;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.12) inset}
 .bpk svg{width:100%;height:auto}.bpk b{font-size:10px;letter-spacing:.08em}.bpk small{font-size:9px;opacity:.85}.bpk em{font-style:normal;font-weight:800;font-size:12px;background:rgba(0,0,0,.35);border-radius:6px;padding:2px 8px}.bpk em.free{background:#3ecf8e;color:#04150c}
 .bpk::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 45%,transparent 60%);background-size:250% 100%;animation:bshine 3s linear infinite;pointer-events:none}
@@ -342,6 +342,36 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
 @keyframes bshard{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r))}}
 @keyframes bflip{0%{transform:perspective(800px) rotateY(180deg) scale(.3);opacity:0}100%{transform:perspective(800px) rotateY(0) scale(1);opacity:1}}
 @keyframes bspin{to{transform:rotate(360deg)}}@keyframes bshine{0%{background-position:150% 0}100%{background-position:-100% 0}}@keyframes bpulse{50%{opacity:.4}}
+
+.btint{position:absolute;inset:0;background:radial-gradient(circle at 50% 46%,var(--rc,#fff),transparent 60%);opacity:0;transition:opacity .5s;pointer-events:none}#booster.tint .btint{opacity:.35}
+.bcrack{position:absolute;inset:0;border-radius:14px;pointer-events:none;opacity:0;background:linear-gradient(100deg,transparent 46%,#fff 49%,var(--tc) 51%,transparent 54%);filter:blur(1px);mix-blend-mode:screen}
+#booster.crack .bcrack{animation:bcr .5s ease-in-out infinite alternate}#booster.crack.shake .bpack{animation:bshake .07s linear infinite}
+@keyframes bcr{0%{opacity:.25}100%{opacity:1}}
+.bstage{position:absolute;inset:0 0 50px;pointer-events:none}
+.bslot{--cw:min(178px,40vw,42vh);position:absolute;left:50%;top:48%;width:var(--cw);aspect-ratio:.7;z-index:calc(5 - var(--k));transform:translate(-50%,-50%) translate(calc(var(--k)*7px),calc(var(--k)*-7px)) rotate(calc(var(--k)*4deg - 2deg)) scale(.15);opacity:0;transition:transform .6s cubic-bezier(.2,1.25,.4,1),opacity .3s;perspective:1000px}
+#booster.smash .bslot{opacity:1;transform:translate(-50%,-50%) translate(calc(var(--k)*7px),calc(var(--k)*-7px)) rotate(calc(var(--k)*4deg - 2deg)) scale(.92);transition-delay:.25s}
+#booster .bslot.lift{z-index:10;transform:translate(-50%,-54%) scale(1.14);transition-delay:0s}
+#booster .bslot.placed{z-index:6;transform:translate(-50%,-50%) translateX(calc(-1 * (var(--cw) * .7 + 90px))) translateY(calc(var(--k) * 10px)) rotate(-6deg) scale(.72);filter:brightness(.55);transition:transform .6s cubic-bezier(.2,1.25,.4,1),filter .4s}
+#booster.fin .bslot.placed{transform:translate(-50%,-50%) translateX(var(--fx)) scale(1);filter:none}
+.bflip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.3,1.5,.5,1)}
+.bslot.flip .bflip{transform:rotateY(180deg)}
+.bback,.bfront{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}.bfront{transform:rotateY(180deg)}
+.bfront .bcard{width:100%;animation:none}.bfront .bcard .holo{animation:bholo 3s linear infinite}
+.bback{border-radius:14px;padding:4px;background:linear-gradient(145deg,#ff7a1a,#3a1405 50%,#ff5b1f);box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.bback>div{height:100%;border-radius:11px;background:repeating-linear-gradient(45deg,#1b1c20 0 8px,#141518 8px 16px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 0 0 2px rgba(255,122,26,.35)}
+.bback svg{width:84%;height:auto;filter:drop-shadow(0 4px 8px #000)}.bback small{font:800 10px/1 var(--display,'Chakra Petch'),Arial;letter-spacing:.4em;color:#ff7a1a}
+.bslot.lift:not(.flip) .bback{animation:btease calc(.22s - var(--rk)*.03s) ease-in-out infinite alternate}
+@keyframes btease{0%{transform:translateX(-2px) rotate(-1deg);box-shadow:0 0 calc(10px + var(--rk)*12px) var(--rc)}100%{transform:translateX(2px) rotate(1deg);box-shadow:0 0 calc(24px + var(--rk)*22px) var(--rc)}}
+.tglow{position:absolute;left:50%;top:50%;width:240%;aspect-ratio:1;transform:translate(-50%,-50%) scale(0);border-radius:50%;background:repeating-conic-gradient(color-mix(in srgb,var(--rc) 70%,transparent) 0 7deg,transparent 7deg 20deg);-webkit-mask:radial-gradient(closest-side,#000 25%,transparent);mask:radial-gradient(closest-side,#000 25%,transparent);transition:transform .5s;pointer-events:none;z-index:-1}
+.bslot.lift .tglow{transform:translate(-50%,-50%) scale(calc(.55 + var(--rk)*.12));animation:bspin 5s linear infinite}
+.bslot.lift .tglow{animation:bspin2 5s linear infinite}@keyframes bspin2{from{rotate:0deg}to{rotate:360deg}}
+.bslot.placed .tglow{transform:translate(-50%,-50%) scale(0)}
+.bburst{position:absolute;left:50%;top:44%;pointer-events:none;z-index:20}.bburst i{position:absolute;width:9px;height:9px;background:var(--c);clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);animation:bshard 1.1s cubic-bezier(.1,.8,.3,1) forwards;opacity:0}
+.bban{position:absolute;top:9%;left:50%;transform:translateX(-50%) scale(0);font:900 clamp(26px,7vw,54px)/1 var(--display,'Chakra Petch'),Arial;letter-spacing:.06em;text-shadow:0 4px 0 #000,0 0 26px currentColor;white-space:nowrap;pointer-events:none;z-index:25;opacity:0}
+.bban.go{animation:bbang 1.6s cubic-bezier(.2,1.6,.4,1) forwards}
+@keyframes bbang{0%{transform:translateX(-50%) scale(2.6) rotate(-6deg);opacity:0}18%{transform:translateX(-50%) scale(1) rotate(-6deg);opacity:1}80%{opacity:1;transform:translateX(-50%) scale(1.04) rotate(-6deg)}100%{opacity:0;transform:translateX(-50%) scale(.9) rotate(-6deg) translateY(-10px)}}
+.bcount{position:absolute;top:12px;right:16px;font:800 12px/1 var(--display,'Chakra Petch'),Arial;letter-spacing:.2em;color:#ddd}
+#booster.smash .bcrack{display:none}#booster.cards .btap{display:block;opacity:0;bottom:14px;animation:none}#booster.hint .btap{opacity:1;animation:bpulse 1s infinite}#booster.fin .btap{display:none}
 #rewfx{position:fixed;inset:0;pointer-events:none;opacity:0;transition:opacity .45s;z-index:6;background:repeating-linear-gradient(0deg,rgba(255,255,255,.07) 0 2px,transparent 2px 6px),linear-gradient(90deg,rgba(80,160,255,.18),rgba(255,60,160,.18))}#hRew{font-size:12px}#multi .pl em{font-style:normal;font-size:11px;color:#f2c40f}.sesg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}.sesg div{background:#202226;border-radius:8px;padding:8px}.sesg small{display:block;color:#9a9da3;font-size:10px}.sesg b{font-size:18px}#moments{position:fixed;inset:0;z-index:67;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:12px}#moments[hidden],#phoBar[hidden]{display:none}#moments .gbox{width:min(520px,94vw);max-height:88vh;overflow-y:auto;background:#15161a;border:1px solid var(--line);border-radius:14px;padding:14px 18px;zoom:var(--uk,1)}#moments h3{margin:0 0 8px;color:var(--accent2);letter-spacing:.15em}#moments .pbtn{display:block;margin:12px auto 0}
 #phoBar{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);display:flex;gap:10px;z-index:40;zoom:var(--uk,1)}#phoQuit{background:#2a2c30;color:#fff}
 #tuto{position:fixed;inset:0;z-index:66;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}#tuto[hidden]{display:none}
@@ -4237,18 +4267,33 @@ function bstBuy(i){const t=BST_T[i],free=i===0&&BST.free>0;if(!free&&BANK.cash<t
   if(free){BST.free--;store.set('tf_bfree',BST.free)}else{BANK.cash-=t.pr;store.set('tf_cash',BANK.cash)}
   const res=bstPick(t);for(const r of res){if(r.dup){r.ref=Math.round(carPrice(r.c)*.5/100)*100;earn(r.ref)}else OWNED[r.c.id]=1}store.set('tf_owned',JSON.stringify(OWNED));STATS.boosters=(STATS.boosters|0)+1;statSave();BST.last=i;renderBst();bstAnim(t,res)}
 function bstAnim(t,res){const el=$('#booster'),inner=`${smashrLogo()}<b>${t.n}</b><small>2 VOITURES · ${bstRange(t).toUpperCase()}</small><small>${t.up?'CLASSE '+RAR[BST_T.indexOf(t)][3]+' · CHANCE DE '+RAR[BST_T.indexOf(t)+1][3]:'CLASSES A · S · X'}</small>`;
-  let sh='';for(let k=0;k<22;k++){const a=Math.random()*6.283,d=120+Math.random()*260;sh+=`<i style="--c:${k%3?t.c1:'#fff'};--dx:${Math.cos(a)*d|0}px;--dy:${Math.sin(a)*d|0}px;--r:${(Math.random()*720-360)|0}deg"></i>`}
-  el.className='';el.innerHTML=`<div class="bpack"><div class="bh l" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div><div class="bh r" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div></div><div class="bfl"></div><div class="bsh">${sh}</div><div class="bstamp">SMASH !</div><div class="bcards"></div><div class="btap">TOUCHE POUR ÉCRASER</div>`;el.hidden=false;
+  let sh='';for(let k=0;k<26;k++){const a=Math.random()*6.283,d=120+Math.random()*280;sh+=`<i style="--c:${k%3?t.c1:'#fff'};--dx:${Math.cos(a)*d|0}px;--dy:${Math.sin(a)*d|0}px;--r:${(Math.random()*720-360)|0}deg"></i>`}
+  el.className='';el.style.setProperty('--tc',t.c1);
+  el.innerHTML=`<div class="btint"></div><div class="bpack"><div class="bh l" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div><div class="bh r" style="--c1:${t.c1};--c2:${t.c2}">${inner}</div><i class="bcrack"></i></div><div class="bfl"></div><div class="bsh">${sh}</div><div class="bstamp">SMASH !</div><div class="bstage"></div><div class="bban"></div><div class="bcount"></div><div class="btap">TOUCHE POUR ÉCRASER</div>`;el.hidden=false;
   try{if(AC)sfxN(AC.currentTime,.45,'bandpass',500,1,.25,2600)}catch(e){}
-  let opened=false;const tm=[];const open=()=>{if(opened)return;opened=true;tm.forEach(clearTimeout);el.classList.remove('shake');void el.offsetWidth;el.classList.add('smash');vib(140);
-    try{if(AC){crashSound(1);sfxN(AC.currentTime,.7,'lowpass',260,1,.55)}}catch(e){}
-    const thumbs=res.map(r=>carThumb(r.c));
-    setTimeout(()=>{const box=el.querySelector('.bcards');box.innerHTML=res.map((r,k)=>cardHTML(r,k,thumbs[k])).join('');
-      res.forEach((r,k)=>setTimeout(()=>{try{if(AC){const t0=AC.currentTime;sfxO(t0,.22,'triangle',520+r.rar*160,.13);sfxO(t0+.09,.3,'triangle',780+r.rar*200,.11);if(r.rar>=3){sfxO(t0+.2,.5,'sine',1320,.09);sfxO(t0+.32,.6,'sine',1760,.07)}}}catch(e){}if(r.rar>=2)vib(60+r.rar*30)},k*420+250));
-      const nw=res.find(r=>!r.dup)||res[0],again=BST_T[BST.last];
-      el.insertAdjacentHTML('beforeend',`<div class="bbtns"><button class="main" data-bx="see">VOIR LA ${escH(nw.c.name.toUpperCase().slice(0,18))}</button><button data-bx="again">ENCORE · ${(BST.last===0&&BST.free>0)?'GRATUIT':again.pr.toLocaleString('fr-FR')+' €'}</button><button data-bx="close">FERMER</button></div>`);
-      el.onclick=e=>{const b=e.target.closest('[data-bx]');if(!b)return;const k=b.dataset.bx;el.hidden=true;el.innerHTML='';if(k==='see'){selectCar(nw.c);const cd=document.querySelector('.card[data-id="'+nw.c.id+'"]');if(cd)cd.scrollIntoView({block:'center',behavior:'smooth'})}else{selectCar(selected);if(k==='again')bstBuy(BST.last)}}},650)};
-  el.onclick=()=>open();tm.push(setTimeout(()=>el.classList.add('shake'),700),setTimeout(open,2800))}
+  const thumbs=res.map(r=>carThumb(r.c)),stage=el.querySelector('.bstage'),n=res.length;let opened=false,step=-1,wait=false,auto=0,done=false;const tm=[];
+  const sfx=(f)=>{try{if(AC)f(AC.currentTime)}catch(e){}};
+  const burst=(r)=>{const R=RAR[r.rar],nb=14+r.rar*10;let h='';for(let k=0;k<nb;k++){const a=Math.random()*6.283,d=90+Math.random()*(160+r.rar*60);h+=`<i style="--c:${k%4?R[1]:'#fff'};--dx:${Math.cos(a)*d|0}px;--dy:${Math.sin(a)*d|0}px;--r:${(Math.random()*540)|0}deg;animation-delay:${(Math.random()*.08).toFixed(2)}s"></i>`}
+    const b=document.createElement('div');b.className='bburst';b.innerHTML=h;el.appendChild(b);setTimeout(()=>b.remove(),1400)};
+  const place=()=>{const s=stage.children[step];s.classList.remove('lift');s.classList.add('placed');el.classList.remove('tint');setTimeout(next,420)};
+  const next=()=>{step++;if(step>=n){finish();return}const s=stage.children[step],r=res[step],R=RAR[r.rar];el.querySelector('.bcount').textContent=(step+1)+' / '+n;
+    s.classList.add('lift');el.style.setProperty('--rc',R[1]);if(r.rar>=2)el.classList.add('tint');
+    const tease=650+r.rar*280;sfx(t0=>{for(let k=0;k<3+r.rar;k++)sfxO(t0+k*tease/1000/(3+r.rar),.08,'square',300+k*70+r.rar*40,.05)});if(r.rar>=3)vib(40);
+    tm.push(setTimeout(()=>{s.classList.add('flip');burst(r);vib(50+r.rar*40);
+      sfx(t0=>{sfxN(t0,.25,'highpass',2500,1,.15);sfxO(t0,.22,'triangle',520+r.rar*160,.13);sfxO(t0+.09,.3,'triangle',780+r.rar*200,.11);if(r.rar>=3){sfxO(t0+.2,.5,'sine',1320,.09);sfxO(t0+.32,.6,'sine',1760,.07)}});
+      if(r.rar>=2){const bb=el.querySelector('.bban');bb.textContent=R[0]+' !';bb.style.color=R[1];bb.className='bban';void bb.offsetWidth;bb.classList.add('go')}
+      if(r.rar>=3){const f=el.querySelector('.bfl');f.style.background=R[1];f.style.animation='none';void f.offsetWidth;f.style.animation='bflash .7s ease-out'}
+      wait=true;el.querySelector('.btap').textContent=step<n-1?'TOUCHE POUR LA CARTE SUIVANTE':'TOUCHE POUR CONTINUER';el.classList.add('hint');auto=setTimeout(()=>{if(wait){wait=false;el.classList.remove('hint');place()}},2200)},tease))};
+  const finish=()=>{done=true;el.querySelector('.bcount').textContent='';el.classList.remove('hint');el.classList.add('fin');const nw=res.find(r=>!r.dup)||res[0],again=BST_T[BST.last];
+    el.insertAdjacentHTML('beforeend',`<div class="bbtns"><button class="main" data-bx="see">VOIR LA ${escH(nw.c.name.toUpperCase().slice(0,18))}</button><button data-bx="again">ENCORE · ${(BST.last===0&&BST.free>0)?'GRATUIT':again.pr.toLocaleString('fr-FR')+' €'}</button><button data-bx="close">FERMER</button></div>`);
+    el.querySelector('.bbtns').onclick=e=>{const b=e.target.closest('[data-bx]');if(!b)return;e.stopPropagation();const k=b.dataset.bx;el.hidden=true;el.innerHTML='';el.onclick=null;
+      if(k==='see'){selectCar(nw.c);const cd=document.querySelector('.card[data-id="'+nw.c.id+'"]');if(cd)cd.scrollIntoView({block:'center',behavior:'smooth'})}else{selectCar(selected);if(k==='again')bstBuy(BST.last)}}};
+  const open=()=>{if(opened)return;opened=true;tm.forEach(clearTimeout);el.classList.remove('shake');void el.offsetWidth;el.classList.add('smash');vib(140);
+    sfx(t0=>{crashSound(1);sfxN(t0,.7,'lowpass',260,1,.55)});
+    stage.innerHTML=res.map((r,k)=>{const R=RAR[r.rar],cw='min(178px,40vw,42vh)';return `<div class="bslot" style="--k:${k};--rc:${R[1]};--rk:${r.rar};--fx:calc((${k} - ${(n-1)/2}) * (${cw} + 18px))"><i class="tglow"></i><div class="bflip"><div class="bback"><div>${smashrLogo()}<small>SMASHR</small></div></div><div class="bfront">${cardHTML(r,0,thumbs[k])}</div></div></div>`}).join('');
+    tm.push(setTimeout(()=>{el.classList.add('cards');next()},900))};
+  el.onclick=()=>{if(!opened){open();return}if(wait){wait=false;clearTimeout(auto);el.classList.remove('hint');place()}};
+  tm.push(setTimeout(()=>el.classList.add('shake'),700),setTimeout(()=>el.classList.add('crack'),1700),setTimeout(open,3000))}
 
 
 /* ---------- classes / raretés : cartes, fiches du garage, halo sous la voiture ---------- */
