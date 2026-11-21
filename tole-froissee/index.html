@@ -2595,7 +2595,36 @@ function netTags(){const W=innerWidth,H=innerHeight,M=34,top=(innerWidth<=640?15
     else{g.el.classList.remove('edge');g.el.querySelector('i').style.transform=''}
     const sc=edge?.85:clamp(1.15-d/400,.75,1.1);g.el.style.transform=`translate(${x}px,${y}px) translate(-50%,-100%) scale(${sc})`;g.el.style.opacity=edge?.9:1}}
 // grande carte : touche la mini-carte
-function drawBig(){if(!MINI)return;const cv=$('#bigc'),g=cv.getContext('2d'),N=820,k=N/(WORLD*2),P=v=>(v+WORLD)*k;g.drawImage(MINI.img,0,0,N,N);
+
+/* ---------- GPS : chemin à suivre vers l'objectif (par les rues en ville) ---------- */
+const NAV={N:null,E:null,path:null,col:'#3ecf8e',t:0,len:0};
+function navGraph(){if(NAV.N)return;const N=[],idx=new Map(),E=[],add=(x,z)=>{const k=x+','+z;if(!idx.has(k)){idx.set(k,N.length);N.push([x,z])}return idx.get(k)},link=(a,b)=>{if(a!==b)E.push([a,b])};
+  const Rr=ROADS,H=470,last=Rr[Rr.length-1];for(let i=0;i<Rr.length;i++)for(let j=0;j<Rr.length;j++){const a=add(Rr[i],Rr[j]);if(i)link(add(Rr[i-1],Rr[j]),a);if(j)link(add(Rr[i],Rr[j-1]),a)}
+  const side=[-H,-150,150,H];for(const sg of [-1,1])for(let k=1;k<side.length;k++){link(add(side[k-1],sg*H),add(side[k],sg*H));link(add(sg*H,side[k-1]),add(sg*H,side[k]))}
+  for(const r of [-150,150])for(const sg of [-1,1]){link(add(r,sg*last),add(r,sg*H));link(add(sg*last,r),add(sg*H,r))}
+  NAV.N=N;NAV.E=E}
+function navSnap(x,z){let best=null;for(const [a,b] of NAV.E){const A=NAV.N[a],B=NAV.N[b],ux=B[0]-A[0],uz=B[1]-A[1],L2=ux*ux+uz*uz,t=clamp(((x-A[0])*ux+(z-A[1])*uz)/L2,0,1),qx=A[0]+ux*t,qz=A[1]+uz*t,d=Math.hypot(x-qx,z-qz);
+    if(!best||d<best.d)best={a,b,q:[qx,qz],d}}return best}
+function navRoute(x0,z0,x1,z1){if(MAP!=='city')return[[x0,z0],[x1,z1]];navGraph();const S=navSnap(x0,z0),T=navSnap(x1,z1),N=NAV.N;
+  if((S.a===T.a&&S.b===T.b)||(S.a===T.b&&S.b===T.a))return[[x0,z0],S.q,T.q,[x1,z1]];
+  const n=N.length,dist=new Array(n).fill(1e12),prev=new Array(n).fill(-1),done=new Array(n).fill(false),adj=[];for(const [a,b] of NAV.E){const w=Math.hypot(N[a][0]-N[b][0],N[a][1]-N[b][1]);(adj[a]=adj[a]||[]).push([b,w]);(adj[b]=adj[b]||[]).push([a,w])}
+  for(const k of [S.a,S.b])dist[k]=Math.hypot(N[k][0]-S.q[0],N[k][1]-S.q[1]);
+  for(;;){let u=-1,bd=1e12;for(let i=0;i<n;i++)if(!done[i]&&dist[i]<bd){bd=dist[i];u=i}if(u<0)break;done[u]=true;for(const [v,w] of adj[u]||[])if(dist[u]+w<dist[v]){dist[v]=dist[u]+w;prev[v]=u}}
+  const ea=dist[T.a]+Math.hypot(N[T.a][0]-T.q[0],N[T.a][1]-T.q[1]),eb=dist[T.b]+Math.hypot(N[T.b][0]-T.q[0],N[T.b][1]-T.q[1]);let k=ea<eb?T.a:T.b;const chain=[];while(k>=0){chain.unshift(N[k]);k=prev[k]}
+  return[[x0,z0],S.q,...chain,T.q,[x1,z1]]}
+function navTarget(){const p=player;if(!p||p.dead)return null;const near=(list,f)=>{let b=null,bd=1e9;for(const q of list){if(f&&!f(q))continue;const d=Math.hypot(q.x-p.x,q.z-p.z);if(d<bd){bd=d;b=q}}return b};
+  if(MIS.on){const m=MISSIONS[MIS.idx%MISSIONS.length];if(m.type==='goto')return[m.to[0],m.to[1],'#3ecf8e'];if(m.ev==='fold'){const q=near(PEOPLE);if(q)return[q.x,q.z,'#b46cff']}}
+  if(RACE.on&&RACE.count<=0){const pt=COURSES[RACE.idx].pts[RACE.k];if(pt)return[pt[0],pt[1],'#ffd21f']}
+  if(PARK.on&&PARK.spot)return[PARK.spot.x,PARK.spot.z,'#3ecf8e'];
+  if(STUNT.on){const g=near(STUNT.rings.map(r=>({x:r.position.x,z:r.position.z,r})),q=>!q.r.userData.done);if(g)return[g.x,g.z,'#ff7a1a']}
+  if(MAP==='circuit'&&p.tyre<25&&PIT.m)return[PIT.x,PIT.z,'#e33'];
+  if(p.fuel<15&&STATIONS.length){const st=near(STATIONS);if(st)return[st.x,st.z,'#2a6fd1']}
+  return null}
+function navTick(dt){NAV.t-=dt;if(NAV.t>0)return;NAV.t=.4;const T=state==='game'?navTarget():null;if(!T){NAV.path=null;return}
+  NAV.path=navRoute(player.x,player.z,T[0],T[1]);NAV.col=T[2];let L=0;for(let i=1;i<NAV.path.length;i++)L+=Math.hypot(NAV.path[i][0]-NAV.path[i-1][0],NAV.path[i][1]-NAV.path[i-1][1]);NAV.len=L}
+function navDraw(ctx,map,w1,w2){const P=NAV.path;if(!P)return;ctx.lineJoin=ctx.lineCap='round';for(const [lw,col] of [[w1,'rgba(10,11,14,.85)'],[w2,NAV.col]]){ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.beginPath();P.forEach((q,i)=>{const [u,v]=map(q[0],q[1]);i?ctx.lineTo(u,v):ctx.moveTo(u,v)});ctx.stroke()}
+  const e=map(P[P.length-1][0],P[P.length-1][1]);ctx.fillStyle=NAV.col;ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e[0],e[1],w1*.9,0,7);ctx.fill();ctx.stroke()}
+function drawBig(){if(!MINI)return;const cv=$('#bigc'),g=cv.getContext('2d'),N=820,k=N/(WORLD*2),P=v=>(v+WORLD)*k;g.drawImage(MINI.img,0,0,N,N);NAV.t=0;navTick(0);navDraw(g,(x,z)=>[P(x),P(z)],12,7);
   const dot=(x,z,r,col)=>{g.fillStyle=col;g.beginPath();g.arc(P(x),P(z),r,0,7);g.fill()};
   for(const k of PICKS)if(k.cool<=0)dot(k.x,k.z,5,k.kind==='n'?'#2b9bff':'#2fbf6a');for(const S0 of SPAWNS){g.fillStyle='#ff5b1f';g.fillRect(P(S0.x)-9,P(S0.z)-9,18,18)}
   for(const q of PEOPLE)dot(q.x,q.z,5,'#b46cff');for(const c of POLICE.list)dot(c.x,c.z,6,'#2b6bff');
@@ -2613,6 +2642,7 @@ function drawMini(p){if(!MINI){if(!worldBuilt)return;buildMiniMap()}const ctx=MI
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,W);ctx.save();ctx.beginPath();ctx.arc(cx,cy,W/2,0,7);ctx.clip();
   const k=MINI.k,ox=-WORLD-p.x,oz=-WORLD-p.z;
   ctx.setTransform(-Z*ca/k,-Z*sa/k,Z*sa/k,-Z*ca/k,cx+Z*(-ca*ox+sa*oz),cy+Z*(-sa*ox-ca*oz));ctx.drawImage(MINI.img,0,0);ctx.setTransform(1,0,0,1,0,0);
+  navDraw(ctx,toMap,11,6);
   const dot=(x,z,r,col)=>{const [u,v]=toMap(x,z);if((u-cx)**2+(v-cy)**2>(W/2)**2)return;ctx.fillStyle=col;ctx.beginPath();ctx.arc(u,v,r,0,7);ctx.fill()};
   for(const q of PEOPLE)dot(q.x,q.z,5,'#b46cff');
   for(const c of cars)if(c!==player&&!c.cop)dot(c.x,c.z,4,c.dead?'#552':'#c9ccd1');
@@ -2624,6 +2654,7 @@ function drawMini(p){if(!MINI){if(!worldBuilt)return;buildMiniMap()}const ctx=MI
   if(RACE.on&&RACE.count<=0){const pt=COURSES[RACE.idx].pts[RACE.k],[u,v]=toMap(pt[0],pt[1]),dd=Math.hypot(u-cx,v-cy),R0=W/2-14;
     ctx.fillStyle='#ffd21f';if(dd<R0){ctx.beginPath();ctx.arc(u,v,9,0,7);ctx.fill()}else{const an=Math.atan2(v-cy,u-cx);ctx.save();ctx.translate(cx+Math.cos(an)*R0,cy+Math.sin(an)*R0);ctx.rotate(an);ctx.beginPath();ctx.moveTo(12,0);ctx.lineTo(-8,-9);ctx.lineTo(-8,9);ctx.closePath();ctx.fill();ctx.restore()}}
   ctx.fillStyle='#3ecf8e';ctx.beginPath();ctx.moveTo(cx,cy-12);ctx.lineTo(cx+8,cy+9);ctx.lineTo(cx,cy+4);ctx.lineTo(cx-8,cy+9);ctx.closePath();ctx.fill();
+  if(NAV.path){const t=NAV.len<1000?Math.round(NAV.len/10)*10+' m':(NAV.len/1000).toFixed(1).replace('.',',')+' km';ctx.font="bold 22px 'Chakra Petch',Arial,sans-serif";const tw=ctx.measureText(t).width+18;ctx.fillStyle='rgba(10,11,14,.85)';ctx.fillRect(cx-tw/2,W-56,tw,30);ctx.fillStyle=NAV.col;ctx.fillText(t,cx,W-34)}
   ctx.restore();ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=4;ctx.beginPath();ctx.arc(cx,cy,W/2-2,0,7);ctx.stroke()}
 
 /* =====================================================================
@@ -3070,7 +3101,7 @@ function chaseEnd(ok,msg){if(!CHASE.on)return;CHASE.on=false;const h=CHASE.heli;
   else if(msg){toast(msg);radio("Ah non, c'est raté !",true)}}
 // ---- gestion commune des événements
 function evClear(){parkStop();DRV.on=false;ENDU.on=false;CHAMP.duel=false;if(RACE.on)raceEnd(true);if(MIS.on)misEnd(false);derbyEnd(true);champEnd(true);stuntStop(true);if(CHASE.on)chaseEnd(false,null);RALLY.on=false}
-function evTick(dt){driftTick(dt);driftEvTick(dt);parkTick(dt);enduTick(dt);snowTick(dt);champTick();rallyTick();stuntTick(dt);chaseTick(dt);pitTick(dt)}
+function evTick(dt){navTick(dt);driftTick(dt);driftEvTick(dt);parkTick(dt);enduTick(dt);snowTick(dt);champTick();rallyTick();stuntTick(dt);chaseTick(dt);pitTick(dt)}
 function evHTML(){const row=(n,d,k)=>`<div class="race"><b>${n}</b><small>${d}</small><button data-ev="${k}">JOUER</button></div>`;
   if(MAP==='city')return `<div class="opt"><h4>ÉVÉNEMENTS</h4></div>`+row('Défi drift','60 s dans l\'arène : glisse pour marquer des points · jusqu\'à 5 000 €','drift')+row('Créneau','3 places de plus en plus petites, sans toucher · jusqu\'à 4 000 €','park')+row('Championnat','5 courses contre 3 pilotes · 10 000 € + la TR-01 Formule','champ')+row('Cascades','90 s : cerceaux de feu et sauts notés · jusqu\'à 6 000 €','stunt')+row('Poursuite police','Tiens 2 min malgré l\'hélico et les barrages · 6 000 € + la TR-LMP','chase');
   if(MAP==='snow')return `<div class="opt"><h4>RALLYE</h4></div>`+row('Spéciale de la montagne','Lacets et plaques de glace, avec ton copilote · 4 000 €','rally');
