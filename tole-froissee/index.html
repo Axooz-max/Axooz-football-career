@@ -187,6 +187,9 @@ button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
   #board{width:120px}#board div{font-size:9px}#toast{font-size:clamp(15px,4.5vw,24px)}#pops span{font-size:clamp(12px,3.6vw,17px)}
   .ptag b{font-size:10px;padding:2px 6px}
 }
+#ctl{zoom:var(--cz,1)}#hud{zoom:var(--hz,1)}
+@media (max-height:500px){html body #chal{left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 60px);width:auto;max-width:46vw}html body #chal b{display:none}html body #chal div:nth-of-type(n+2){display:none}html body #chal div{font-size:10px}}
+@media (max-width:500px){html body #chal{top:calc(env(safe-area-inset-top,0px) + 150px);left:auto;right:max(12px,env(safe-area-inset-right,0px));width:150px}}
 #tags{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .ptag{position:absolute;left:0;top:0;transform:translate(-50%,-100%);display:flex;flex-direction:column;align-items:center;white-space:nowrap;will-change:transform}
 .ptag b{background:rgba(10,11,14,.78);border:1.5px solid var(--accent);color:var(--accent2);font-size:12px;letter-spacing:.06em;padding:3px 8px;border-radius:6px}
@@ -277,7 +280,7 @@ button:focus-visible{outline:2px solid var(--accent2);outline-offset:2px}
   <div class="sp"></div>
   <div id="netChip" hidden></div><div id="unlChip" hidden></div><div id="wanted" hidden></div><div id="raceChip" hidden></div><div id="turChip" hidden></div><div id="misChip" hidden></div><div id="modeChip" hidden></div>
   <div class="tools"><button id="hRepair">RÉPARER</button><button id="hCam">CAMÉRA</button><button id="hMore" aria-expanded="false">⋯</button>
-    <div id="moreMenu" hidden><button id="hCtl">COMMANDES</button><button id="hTime">NUIT</button><button id="hMap">CARTE</button><button id="hWx">MÉTÉO : AUTO</button><button id="hRadio">RADIO : OFF</button><button id="hQual">QUALITÉ</button><button id="hReplay">REPLAY</button><button id="hSnd">SON</button></div></div>
+    <div id="moreMenu" hidden><button id="hCtl">COMMANDES</button><button id="hTime">NUIT</button><button id="hMap">CARTE</button><button id="hWx">MÉTÉO : AUTO</button><button id="hRadio">RADIO : OFF</button><button id="hQual">QUALITÉ</button><button id="hSize">BOUTONS : MOYENS</button><button id="hReplay">REPLAY</button><button id="hSnd">SON</button></div></div>
 </div>
 <div id="ctl" hidden>
   <div class="btn st" id="bL" data-k="left"><svg viewBox="0 0 10 10"><path d="M7 1 2 5l5 4z"/></svg></div>
@@ -957,13 +960,14 @@ class Car{
     deformArr(this.det.P,this.det.O,lx,ly,lz,dx,dy,dz,str,rad,belt);this.det.geo.attributes.position.needsUpdate=true;this.det.geo.computeVertexNormals();
     for(const g of this.glows.concat(this.plates)){deformArr(g.P,g.O,lx,ly,lz,dx,dy,dz,str,rad,belt);g.geo.attributes.position.needsUpdate=true}
     if(this===player&&NET.room)netRecord('dents',[lx,ly,lz,dx,dy,dz,str,rad]);
-    for(const w of this.wheels){const d=Math.hypot(w.x-lx,w.z-lz);if(d<rad*1.1)w.camber=clamp(w.camber+w.sg*str*.6*(1-d/(rad*1.1)),-.3,.3)}
+    for(const w of this.wheels){const d=Math.hypot(w.x-lx,w.z-lz);if(d<rad*1.1)w.camber=clamp(w.camber+w.sg*str*.6*(1-d/(rad*1.1)),-.3,.3);
+      if(!w.off&&!this.isGhost&&this!==showCar&&d<rad*.85&&(Math.abs(w.camber)>=.27||(str>.3&&Math.random()<.35)))wheelOff(this,w)}
   }
   repair(){if(this===player)netReset();this.zone={};this.lost={};this.crisp.reset();this.det.P.set(this.det.O);this.det.geo.attributes.position.needsUpdate=true;this.det.geo.computeVertexNormals();
     this.det.geo.attributes.color.array.set(this.det.C0);this.det.geo.attributes.color.needsUpdate=true;
     for(const g of this.glows.concat(this.plates)){g.P.set(g.O);g.geo.attributes.position.needsUpdate=true;g.m.visible=true}
     this.wraps=[];this.fly=false;this.flipped=false;this.tRoll=this.tPit=this.tRollV=this.tPitV=0;this.vyA=0;
-    for(const w of this.wheels){w.camber=0;w.pv.position.x=w.x;w.pv.position.z=w.z}this.damage=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.air=false;this.flipA=0;this.group.position.y=0;this.group.rotation.x=0;if(!this.wasParked)this.parked=false}
+    for(const w of this.wheels){w.camber=0;w.pv.position.x=w.x;w.pv.position.z=w.z;w.off=false;w.pv.visible=true}this.damage=0;this.dead=false;this.deadT=0;this.jy=0;this.vy=0;this.air=false;this.flipA=0;this.group.position.y=0;this.group.rotation.x=0;if(!this.wasParked)this.parked=false}
   sync(dt){
     const air=this.fly||this.flipped;
     if(!air){const kr=Math.min(1,dt*10);this.rp=lerp(this.rp,this.rpT,kr);this.rr=lerp(this.rr,this.rrT,kr)}
@@ -971,7 +975,8 @@ class Car{
     for(const w of this.wheels){w.m.rotation.x=this.spin;w.pv.rotation.y=w.front?this.steer:0;w.pv.rotation.z=w.camber}
     this.roll=lerp(this.roll,clamp(this.latA*.011,-.07,.07),Math.min(1,dt*6));
     this.pitch=lerp(this.pitch,clamp(-this.acc*.006,-.05,.05),Math.min(1,dt*5));
-    this.body.rotation.z=this.roll;this.body.rotation.x=this.pitch;
+    let lr=0,lp=0;for(const w of this.wheels)if(w.off){lr+=w.sg*.07;lp+=(w.front?1:-1)*.06}
+    this.body.rotation.z=this.roll-lr;this.body.rotation.x=this.pitch+lp;this.body.position.y=(this.sp.stance||0)*.06-(lr||lp?.08:0);
     const fx=this.group.parent===show?fxShow:fxGame,gp=this.group.position;
     if(this.dead){this.deadT+=dt;this.vy-=GRAV*dt;this.jy+=this.vy*dt;
       if(this.air)this.flipA=Math.min(Math.PI*2,this.flipA+dt*Math.PI*2/AIRT);
@@ -1793,6 +1798,10 @@ function stepCar(c,inp,dt){
   let acc=0;
   const UP=c===player?UPG:null,vmx=c.vmax*(UP?1+.06*UP.engine:1),acl=c.accel*(UP?1+.12*UP.engine:1);
   if(inp.gas){acc=vF<-.5?10:acl*Math.max(0,1-(vF/vmx)**2)}
+  // roues perdues : la voiture frotte, freine et tire du côté de la roue manquante
+  {let lost=0,pull=0;for(const w of c.wheels)if(w.off){lost++;pull+=w.sg*(w.front?1.4:.6)}
+   if(lost){acc-=Math.sign(vF)*lost*1.6;c.steer+=pull*.02*Math.min(1,Math.abs(vF)/8)*dt*8;
+     if(Math.abs(vF)>3&&Math.random()<.5){const w=c.wheels.find(w=>w.off),ca=Math.cos(c.a),sa=Math.sin(c.a);sparks(c.x+w.x*ca+w.z*sa,c.z-w.x*sa+w.z*ca,2)}}}
   // nitro : se déclenche seulement jauge pleine, puis dure tant qu'on appuie (jusqu'à la vider)
   if(c===player){
     if(inp.nitro&&!c.nitroHeld){c.nitroHeld=true;if(c.nitro>=100)c.boostOn=true;else if(!c.fly)toast('NITRO EN RECHARGE')}
@@ -1940,7 +1949,20 @@ function partOff(c,zk){if(PARTS.length>40){const o=PARTS.shift();game.remove(o.m
   linearize(m);m.castShadow=SHADOWS;const ca=Math.cos(c.a),sa=Math.sin(c.a),lx=zk==='L'?sp.W/2:zk==='R'?-sp.W/2:0,lz=zk==='F'?sp.L/2:zk==='B'?-sp.L/2:0;
   m.position.set(c.x+lx*ca+lz*sa,.5,c.z-lx*sa+lz*ca);m.rotation.y=c.a;game.add(m);
   PARTS.push({m,vx:c.vx*.6+(lx*ca+lz*sa)*2,vz:c.vz*.6+(-lx*sa+lz*ca)*2,vy:3+Math.random()*2,sx:(Math.random()-.5)*8,sz:(Math.random()-.5)*8,life:40});if(c===player)toast(zk==='F'||zk==='B'?'PARE-CHOCS ARRACHÉ !':'PORTIÈRE ARRACHÉE !')}
-function partsTick(dt){for(let i=PARTS.length-1;i>=0;i--){const o=PARTS[i];o.life-=dt;if(o.life<=0){game.remove(o.m);PARTS.splice(i,1);continue}const m=o.m;
+// roue arrachée : elle part en roulant, rebondit puis se couche
+const LOOSE=[];
+function wheelOff(c,w){w.off=true;w.pv.visible=false;const m=new THREE.Mesh(w.m.geometry,w.m.material);m.castShadow=SHADOWS;
+  const ca=Math.cos(c.a),sa=Math.sin(c.a),wx=c.x+w.x*ca+w.z*sa,wz=c.z-w.x*sa+w.z*ca,ox=ca*w.sg,oz=-sa*w.sg;
+  m.position.set(wx,c.sp.wr+c.y,wz);m.rotation.set(0,c.a,0,'YXZ');game.add(m);if(LOOSE.length>16){const o=LOOSE.shift();game.remove(o.m)}
+  LOOSE.push({m,r:c.sp.wr,vx:c.vx*.9+ox*4,vz:c.vz*.9+oz*4,vy:2.5+Math.random()*2,spin:0,tilt:0,life:45,a:c.a});sparks(wx,wz,16);crashSound(.4);
+  if(c===player){toast('ROUE ARRACHÉE !');addScore(400,'ROUE PERDUE',true);if(NET.room)netSend()}}
+function looseTick(dt){for(let i=LOOSE.length-1;i>=0;i--){const o=LOOSE[i],m=o.m;o.life-=dt;if(o.life<=0){game.remove(m);LOOSE.splice(i,1);continue}
+    o.vy-=16*dt;m.position.x+=o.vx*dt;m.position.z+=o.vz*dt;m.position.y+=o.vy*dt;const sp=Math.hypot(o.vx,o.vz);
+    const fl=o.r*Math.cos(o.tilt)+.11*Math.abs(Math.sin(o.tilt)),gy=groundAt(m.position.x,m.position.z);
+    if(m.position.y<gy+fl){m.position.y=gy+fl;o.vy=Math.abs(o.vy)>2.5?-o.vy*.4:0;const k=Math.max(0,1-dt*(sp<3?2.5:.35));o.vx*=k;o.vz*=k;if(sp<4)o.tilt=Math.min(Math.PI/2,o.tilt+dt*1.4)}
+    if(sp>.3)o.a=Math.atan2(o.vx,o.vz);o.spin+=sp*dt/o.r;m.rotation.set(o.spin,o.a,o.tilt,'YZX');
+    for(const c of cars){if(c.dead)continue;const dx=m.position.x-c.x,dz=m.position.z-c.z;if(dx*dx+dz*dz<(c.hw+.4)**2&&sp>2){o.vx=-o.vx*.4+c.vx;o.vz=-o.vz*.4+c.vz;o.vy=2;break}}}}
+function partsTick(dt){looseTick(dt);for(let i=PARTS.length-1;i>=0;i--){const o=PARTS[i];o.life-=dt;if(o.life<=0){game.remove(o.m);PARTS.splice(i,1);continue}const m=o.m;
     if(m.position.y>.1||o.vy>0){o.vy-=16*dt;m.position.x+=o.vx*dt;m.position.z+=o.vz*dt;m.position.y+=o.vy*dt;m.rotation.x+=o.sx*dt;m.rotation.z+=o.sz*dt;
       if(m.position.y<.1){m.position.y=.1;o.vy=Math.abs(o.vy)>2?-o.vy*.3:0;o.vx*=.5;o.vz*=.5;o.sx*=.4;o.sz*=.4;if(Math.abs(o.vy)<.1){m.rotation.x=Math.round(m.rotation.x/(Math.PI/2))*Math.PI/2;m.rotation.z=Math.round(m.rotation.z/(Math.PI/2))*Math.PI/2}}}}}
 const SPK=260,spkPos=new Float32Array(SPK*3),spkVel=new Float32Array(SPK*3),spkLife=new Float32Array(SPK);let spkI=0;
@@ -2054,7 +2076,7 @@ async function netLeave(silent){const r=NET.room;NET.room=null;NET.mode=null;NET
 function netSend(){
   if(!NET.room||!player)return;const p=player,cu=customs[selected.id]||{};
   NET.room.presence({on:state==='game'?1:0,n:NET.nick||'',car:selected.id,
-    cu:{c:cu.color||'',r:cu.rim||'',t:cu.tint||0,s:cu.stance||0,w:cu.wing==null?-1:cu.wing,p:(cu.plate||'').slice(0,10),ne:cu.neon||'',fl:cu.flames||0,nu:cu.num||0},
+    cu:{c:cu.color||'',r:cu.rim||'',t:cu.tint||0,s:cu.stance||0,w:cu.wing==null?-1:cu.wing,p:(cu.plate||'').slice(0,10),ne:cu.neon||'',fl:cu.flames||0,nu:cu.num||0},wl:p.wheels.reduce((m,w,i)=>m|(w.off?1<<i:0),0),
     x:r2(p.x),z:r2(p.z),y:r2(p.y),a:r3(p.a),vx:r2(p.vx),vz:r2(p.vz),vf:r2(p.vF),st:r3(p.steer),rp:r3(p.rp),rr:r3(p.rr),tr:r3(p.tRoll),tp:r3(p.tPit),
     fl:p.fly?1:0,fp:p.flipped?1:0,br:p.brakeOn?1:0,dm:Math.round(p.damage),dd:p.dead?1:0,g:NET.gen,dn:NET.dents,fo:NET.folds,
     gs:GOLD.mine,sc:SC.score,qc:QC.last,tg2:MODE.tagOut,lv:MODE.lives,md:netIsHost()?MODE.def:null,tu:GOLD.tur>0?1:0,mp:MAP,tg:GOLD.tur>0&&GOLD.tgt?[r2(GOLD.tgt.c.x),r2(GOLD.tgt.c.z)]:null,hs:GOLD.hits}).catch(()=>{});
@@ -2089,6 +2111,7 @@ function netUpdate(dt){
     const age=Math.min(.25,(now-g.tr)/1000),tx=clamp(num(t.x)+num(t.vx)*age,-WORLD,WORLD),tz=clamp(num(t.z)+num(t.vz)*age,-WORLD,WORLD),k=Math.min(1,dt*12);
     if(Math.hypot(tx-c.x,tz-c.z)>15){c.x=tx;c.z=tz}else{c.x=lerp(c.x,tx,k);c.z=lerp(c.z,tz,k)}
     c.a+=wrapA(num(t.a)-c.a)*k;c.y=lerp(c.y,clamp(num(t.y),0,40),k);c.vx=num(t.vx);c.vz=num(t.vz);c.vF=num(t.vf);c.steer=num(t.st);c.rp=num(t.rp);c.rr=num(t.rr);c.rpT=c.rp;c.rrT=c.rr;
+    {const wl=num(t.wl)|0;c.wheels.forEach((w,i)=>{const o=!!(wl&(1<<i));if(o&&!w.off){w.off=true;w.pv.visible=false;sparks(c.x,c.z,10)}else if(!o&&w.off){w.off=false;w.pv.visible=true}})}
     c.tRoll=num(t.tr);c.tPit=num(t.tp);c.fly=!!t.fl;c.flipped=!!t.fp;c.brakeOn=!!t.br;if(!c.dead)c.damage=clamp(num(t.dm),0,100);c.gnd=groundAt(c.x,c.z);
     c.sync(dt);
   }
@@ -2547,6 +2570,9 @@ $('#hMore').onclick=()=>{const m=$('#moreMenu');m.hidden=!m.hidden;$('#hMore').s
 for(const id of ['#hCtl','#hTime','#hSnd'])$(id).addEventListener('click',()=>{$('#moreMenu').hidden=true});
 $('#hMap').onclick=()=>{$('#moreMenu').hidden=true;$('#bigmap').hidden=false;drawBig()};
 $('#hRadio').onclick=()=>{initAudio();radioSet((RADIO.st+1)%4);toast('RADIO '+(STATIONS[RADIO.st]?STATIONS[RADIO.st].name:'COUPÉE'))};
+const SIZES=[['PETITS',.82,.9],['MOYENS',1,1],['GRANDS',1.22,1.1]];let SIZE=store.get('tf_size')==null?1:+store.get('tf_size');
+function applySize(){const z=SIZES[SIZE];document.documentElement.style.setProperty('--cz',z[1]);document.documentElement.style.setProperty('--hz',z[2]);$('#hSize').textContent='BOUTONS : '+z[0]}
+$('#hSize').onclick=()=>{SIZE=(SIZE+1)%3;store.set('tf_size',SIZE);applySize();toast('BOUTONS '+SIZES[SIZE][0]);$('#moreMenu').hidden=true};applySize();
 $('#hQual').onclick=()=>{QUAL=(QUAL+2)%3;store.set('tf_q2',QUAL);applyQuality();toast('QUALITÉ '+QUALS[QUAL])};
 $('#hReplay').onclick=()=>replayStart();$('#replayStop').onclick=()=>replayStop();
 for(const id of ['#hRadio','#hQual','#hReplay'])$(id).addEventListener('click',()=>{$('#moreMenu').hidden=true});
