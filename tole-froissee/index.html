@@ -418,6 +418,22 @@ html body #ctl.wheelMode #bK{left:calc(max(14px,env(safe-area-inset-left,0px)) +
   text-shadow:0 2px 12px rgba(0,0,0,.6);pointer-events:none;opacity:0;transition:opacity .25s}
 #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);font-size:14px;letter-spacing:.2em;color:var(--mute);z-index:9}
 @media (prefers-reduced-motion:reduce){.bar i,#toast{transition:none}}
+
+/* contrôles plus grands en paysage sur téléphone */
+@media (pointer:coarse) and (orientation:landscape) and (max-height:520px){
+  html body .btn,html body #wheel{zoom:var(--cz,1)}
+  html body .st{width:96px;height:96px;border-radius:26px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+  html body #bL{left:max(18px,env(safe-area-inset-left,0px))}
+  html body #bR{left:calc(max(18px,env(safe-area-inset-left,0px)) + 96px + 14px)}
+  html body #bG{right:max(18px,env(safe-area-inset-right,0px));width:88px;height:150px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);font-size:12px}
+  html body #bB{right:calc(max(18px,env(safe-area-inset-right,0px)) + 88px + 14px);width:100px;height:96px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);font-size:12px}
+  html body #bH{right:calc(max(18px,env(safe-area-inset-right,0px)) + 88px + 14px);bottom:calc(env(safe-area-inset-bottom,0px) + 14px + 96px + 10px);width:100px;height:48px;font-size:10px}
+  html body #bN{right:max(18px,env(safe-area-inset-right,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 14px + 150px + 10px);width:88px;height:52px;font-size:11px}
+  html body #bK{left:max(18px,env(safe-area-inset-left,0px));bottom:calc(env(safe-area-inset-bottom,0px) + 14px + 96px + 10px);width:96px;height:44px;font-size:11px}
+  html body #wheel{width:176px;height:176px}
+  html body #ctl.wheelMode #bK{left:calc(max(18px,env(safe-area-inset-left,0px)) + 176px + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 14px)}
+  html body .btn svg{width:26px;height:26px}
+}
 </style>
 </head>
 <body>
