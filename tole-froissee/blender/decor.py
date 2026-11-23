@@ -131,4 +131,16 @@ for k in range(9):
         poly([(a[0]+nx,a[1],a[2]+nz),(a[0]-nx,a[1],a[2]-nz),(b[0]-nx*.8,b[1],b[2]-nz*.8),(b[0]+nx*.8,b[1],b[2]+nz*.8)],[(0,1,2,3)],2+(k%2))
 for k in range(4):sph(.16,(top[0]+math.cos(k*1.6)*.25,top[1]-.35,top[2]+math.sin(k*1.6)*.25),4)
 R['palm']=export('palm')
+
+# ================= DÉTAILS DE RUE =================
+def plate(n,r,y,mi,rot=0):
+    o=cyl(r,r,.05,(0,y,.06),mi,n,(math.pi/2,0,rot),False);return o
+reset();cyl(.04,.04,2.6,(0,1.3,0),6,8);plate(8,.38,2.55,0,math.pi/8);plate(8,.32,2.55,2,math.pi/8);o=bpy.data.objects[-1];o.location.z=.09;R['sstop']=export('sstop')
+reset();cyl(.04,.04,2.6,(0,1.3,0),6,8);poly([(-.42,2.75,.08),(.42,2.75,.08),(0,2.05,.08)],[(0,1,2)],0);poly([(-.3,2.68,.1),(.3,2.68,.1),(0,2.17,.1)],[(0,1,2)],2);R['syield']=export('syield')
+reset();cyl(.04,.04,2.6,(0,1.3,0),6,8);plate(20,.34,2.5,0);plate(20,.27,2.5,2);o=bpy.data.objects[-1];o.location.z=.09;box((.08,.2,.02),(-.07,2.5,.12),3);box((.08,.2,.02),(.07,2.5,.12),3);R['sspeed']=export('sspeed')
+reset();cyl(.38,.38,.03,(0,.015,0),6,16,UP,False);[box((.62,.005,.04),(0,.032,-.24+i*.12),3) for i in range(5)];R['manhole']=export('manhole')
+reset();cyl(.13,.1,9,(0,4.5,0),4,8);box((1.8,.12,.12),(0,8.4,0),4);[cyl(.05,.05,.18,(x,8.55,0),2,6) for x in (-.75,-.25,.25,.75)];box((.4,.5,.3),(0,6.5,.18),6);R['upole']=export('upole')
+reset();box((2.2,2.4,1.6),(0,1.2,0),0,bv=.04);box((2.5,.15,1.9),(0,2.5,0),1);box((1.9,1.0,.05),(0,1.5,.81),3);box((2.3,.12,.5),(0,1.0,1.0),4);[box((.25,.32,.02),(-.8+i*.4,1.65,.84),5) for i in range(5)];R['kiosk']=export('kiosk')
+reset();[box((.08,1,.08),(x,.5,0),6) for x in (-.9,.9)];[box((2,.18,.05),(0,y,0),7 if i%2 else 2) for i,y in enumerate((.55,.85))];[box((.25,.18,.06),(-.75+k*.5,.85,.01),0) for k in range(4)];R['barrier']=export('barrier')
+reset();cyl(.18,.03,.7,(0,.37,0),0,10);cyl(.15,.12,.08,(0,.38,0),2,10);box((.42,.04,.42),(0,.02,0),6);R['cone']=export('cone')
 json.dump(R,open(OUT+'decor.json','w'),separators=(',',':'));print('taille',len(json.dumps(R))//1024,'Ko',{k:len(json.dumps(v))//1024 for k,v in R.items()})
