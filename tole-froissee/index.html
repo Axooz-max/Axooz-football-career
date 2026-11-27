@@ -655,7 +655,7 @@ C('Audi','RS6 Avant C5',2002,450,1865,250,X('suv',4.85,1.85,1.42,2.76,.34,{clr:.
 C('Peugeot','106 Rallye',1994,100,825,190,X('hatch',3.56,1.59,1.38,2.39,.28,{round:.14,color:'#f2f2ee',lights:'slim',grille:'red',rim:'#e6e9ee'})),
 C('Peugeot','306 GTI-6',1997,167,1215,220,X('hatch',4.03,1.69,1.38,2.58,.31,{round:.14,color:'#1d2340',lights:'slim',grille:'wide',intake:1})),
 C('Peugeot','208 GTi',2013,200,1160,230,X('hatch',3.96,1.73,1.46,2.54,.32,{round:.18,nose:.12,color:'#d9d9d6',lights:'slim',grille:'wide',intake:1})),
-C('Peugeot','308',2022,130,1290,210,X('hatch',4.37,1.85,1.44,2.68,.33,{round:.17,nose:.12,color:'#b5121b',lights:'slim',grille:'wide',intake:1,fixedPlate:'HERVÉ'})),
+C('Peugeot','308',2022,130,1290,210,X('hatch',4.37,1.85,1.44,2.68,.33,{round:.2,nose:.15,hoodF:.47*1.44,hood:.6*1.44,belt:.66*1.44,ws:.26,roofF:.45,roofR:.72,rw:.95,roofExp:1.25,tailSlope:.12,tail:.62*1.44,trunk:.66*1.44,color:'#b5121b',lights:'slim',grille:'none',tailL:'small',rimd:4,rim:'#2a2c30',intake:1,flare:.02,fixedPlate:'HERVÉ',p308:1})),
 C('Renault','4L',1975,34,620,115,X('box4x4',3.66,1.49,1.55,2.45,.3,{clr:.24,ws:.27,roofF:.38,roofR:.97,color:'#e9e0c4',lights:'round2',grille:'wide',tailL:'small',bumper:'chrome',ww:.15})),
 C('Renault','Mégane RS',2019,280,1430,255,X('hatch',4.36,1.87,1.44,2.67,.34,{round:.18,nose:.12,color:'#e8641e',lights:'slim',grille:'wide',intake:1,wing:.5,ww:.26})),
 C('Renault','Espace',1988,120,1250,180,X('mono',4.25,1.78,1.66,2.58,.3,{ws:.08,roofF:.28,roofR:.97,rw:.995,color:'#5a6a7a',lights:'rect',grille:'wide',bumper:'black'})),
@@ -1319,7 +1319,7 @@ class Car{
     if(sp.flames||sp.num||sp.spon||sp.stk)this.decals(sp);
     this.det={geo:dg,P:dg.attributes.position.array,O:dg.attributes.position.array.slice(),C0:dg.attributes.color.array.slice()};
     this.body.position.y=(sp.stance||0)*.06;
-    this.detMesh=new THREE.Mesh(dg,MAT_DET);this.body.add(this.detMesh);this.inds=indMeshes(sp,S);for(const m of this.inds)this.body.add(m);if(sp.kit||sp.hdk||sp.spl||sp.dif||sp.rfc)this.body.add(kitMesh(sp,S));this.crack=crackMesh(sp,S);if(this.crack){this.body.add(this.crack.m);this.plates.push(this.crack)}
+    this.detMesh=new THREE.Mesh(dg,MAT_DET);this.body.add(this.detMesh);if(sp.p308)deco308(this,sp,S);this.inds=indMeshes(sp,S);for(const m of this.inds)this.body.add(m);if(sp.kit||sp.hdk||sp.spl||sp.dif||sp.rfc)this.body.add(kitMesh(sp,S));this.crack=crackMesh(sp,S);if(this.crack){this.body.add(this.crack.m);this.plates.push(this.crack)}
     const wg=buildWheelGeo(sp),bg=buildBrakeGeo(sp),w3=wheel3D(sp);this.wheels=[];
     const wx=sp.W/2-sp.ww/2+.012+(sp.flare||0)*.75+(sp.wheelOut||0);
     for(const [z,front] of S.axles.map((z,i)=>[z,i===0?1:0]))for(const sg of [-1,1]){
@@ -9077,6 +9077,28 @@ function hubAct77(k,close){if(k==='hub_soc'){const L=SOC.posts.slice(0,8);rows69
 setTimeout(()=>{const b=$('#mHub77');if(b)b.onclick=hubOpen77},0);
 
 setTimeout(()=>{try{if(!store.get('tf_308')){OWNED['peugeot-308']=1;store.set('tf_owned',JSON.stringify(OWNED));store.set('tf_308','1');setTimeout(()=>toast('🎁 NOUVELLE VOITURE AU GARAGE : PEUGEOT 308 « HERVÉ »'),4000);try{renderList()}catch(e){}}}catch(e){}},1500);
+
+/* ---------- Peugeot 308 « HERVÉ » : détails spécifiques ---------- */
+function deco308(car,sp,S){try{const g=new THREE.Group(),L=sp.L,W=sp.W,H=sp.H,blk=wM('#0d0e10',{shininess:120,specular:0x666666}),chr=wM('#d9dce0',{shininess:160,specular:0xffffff}),led=new THREE.MeshBasicMaterial({color:'#f4fbff'}),red=new THREE.MeshBasicMaterial({color:'#ff1a1a'});led.userData.lin=1;red.userData.lin=1;
+  const B=(w,h,d,x,y,z,m,rx,ry,rz)=>{const b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);b.rotation.set(rx||0,ry||0,rz||0);g.add(b);return b};
+  const ZF=y=>S.zAt(0,clamp(y/sp.hood,0,1))+.012,zf=ZF(sp.hoodF*.6),zr=S.zAt(.995,.5)-.01,yh=sp.hoodF;
+  // calandre noire sans cadre et grande prise d'air
+  B(W*.5,yh*.2,.04,0,yh*.8,ZF(yh*.8),blk);B(W*.66,yh*.2,.04,0,sp.clr+.16,ZF(sp.clr+.16)-.01,blk);
+  for(let i=0;i<4;i++)B(W*.46,.012,.045,0,yh*.72+i*yh*.05,ZF(yh*.72+i*yh*.05)+.005,wM('#3a3c40',{shininess:140}));
+  // logo (blason)
+  const lg=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.02,6),chr);lg.rotation.x=Math.PI/2;lg.position.set(0,yh*.8,ZF(yh*.8)+.03);g.add(lg);
+  // feux de jour en « crocs » : 2 traits verticaux inclinés sous chaque phare
+  for(const sx of [-1,1]){const hw=S.hwBase(0,.45);for(let k=0;k<2;k++){const x=sx*(hw*.74-k*.08),y=yh*.6;B(.024,yh*.26,.02,x,y,ZF(y)-.004,led,0,0,sx*.3)}const y2=yh*.8;B(.26,.045,.02,sx*hw*.6,y2,ZF(y2)-.004,led,0,0,-sx*.12)}
+  // feux arrière à 3 griffes
+  for(const sx of [-1,1]){const hw=S.hwBase(.99,.6);B(.46,.2,.03,sx*(hw-.28),sp.tail*.86,zr,wM('#2a0608',{shininess:150}));for(let k=0;k<3;k++)B(.05,.15,.035,sx*(hw-.42+k*.12),sp.tail*.86,zr-.005,red,0,0,sx*.35)}
+  B(W*.5,.06,.03,0,sp.tail*.86,zr+.004,wM('#1a0405',{shininess:150}));
+  // logo arrière, becquet et diffuseur
+  const lr=lg.clone();lr.position.set(0,sp.tail*.74,zr-.02);g.add(lr);B(W*.62,.04,.22,0,H-.02,S.zAt(sp.roofR+.03,1)-.05,blk,-.15);B(W*.6,.1,.06,0,sp.clr+.12,zr-.02,blk);
+  // toit noir brillant
+  const zA=S.zAt(sp.roofF+.02,1),zB=S.zAt(sp.roofR-.02,1);B(W*.66,.012,Math.abs(zA-zB),0,H+.004,(zA+zB)/2,blk);
+  // jonc chromé sous les vitres
+  for(const sx of [-1,1]){const zw0=S.zAt(sp.ws+.02,.7),zw1=S.zAt(sp.rw-.06,.7);B(.012,.018,Math.abs(zw0-zw1),sx*(S.hwBase(.5,.7)+.005),sp.belt+.02,(zw0+zw1)/2,chr)}
+  car.body.add(g);car.p308=g}catch(e){}}
 let toastT=0;function toast(t){try{t=tr77(String(t))}catch(e){}const e=$('#toast');e.textContent=t;e.classList.toggle('long',t.length>22);e.style.opacity=1;toastT=t.length>22?2.8:1.1}
 
 const coarse=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
