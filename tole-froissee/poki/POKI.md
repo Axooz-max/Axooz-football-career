@@ -85,3 +85,27 @@ Vérifié dans mon navigateur de test, avec Internet entièrement bloqué et un 
 **SMASHR** — Conduis plus de 180 voitures dans une grande ville ouverte et plie la tôle comme jamais ! Dégâts réalistes, cascades, courses, métiers (pompier, routier, taxi volant…), concerts, carnaval et trois autres villes à découvrir : Méditerranée, Far West et village alpin.
 
 **Commandes** : flèches ou ZQSD pour conduire · Espace frein à main · Maj nitro · G sortir de la voiture · C caméra · boutons à l'écran sur mobile.
+
+### Description in English
+
+**Short (one line)**
+Smash, drive and explore: 180+ cars, realistic crumpling metal and a huge living city.
+
+**Full description**
+SMASHR is an open-world driving sandbox where every crash leaves its mark. Pick from more than 180 cars – from classic hatchbacks to supercars and monster trucks – and watch the metal bend, the glass shatter and the parts fly off with every impact.
+
+Cruise a big living city with traffic, pedestrians, day and night and changing weather, or chase thrills: jumps, stunts, races, police chases and rallycross. Take on jobs like firefighter, tow-truck driver, flying taxi or ice-cream seller, build your garage collection and decorate your own house.
+
+When the city is not enough, travel by plane or steam train to three more towns: a sunny Mediterranean coast, a dusty Far West and a snowy alpine village, each with its own races, activities and secrets.
+
+No account needed – just press DRIVE and play.
+
+**Controls**
+- Arrow keys / WASD: drive
+- Space: handbrake
+- Shift: nitro
+- G: get out of the car
+- C: change camera
+- Touch buttons on mobile
+
+**Tags**: car, driving, crash, sandbox, open world, racing, stunt, simulator
